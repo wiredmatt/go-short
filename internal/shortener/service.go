@@ -9,21 +9,33 @@ import (
 	"github.com/wiredmatt/go-backend-template/internal/storage"
 )
 
-type Service struct {
-	store   storage.Store
-	baseURL string
+// Service defines the interface for URL shortening operations
+type IShortenerService interface {
+	GetBaseURL() string
+	Shorten(userID, originalURL string) (string, error)
+	Resolve(code string) (string, error)
 }
 
-func NewService(store storage.Store, baseURL string) *Service {
-	return &Service{store: store, baseURL: baseURL}
+type ShortenerService struct {
+	store           storage.Store
+	baseURL         string
+	shortCodeLength int
 }
 
-func (s *Service) GetBaseURL() string {
+func NewService(store storage.Store, baseURL string, shortCodeLength int) *ShortenerService {
+	return &ShortenerService{
+		store:           store,
+		baseURL:         baseURL,
+		shortCodeLength: shortCodeLength,
+	}
+}
+
+func (s *ShortenerService) GetBaseURL() string {
 	return s.baseURL
 }
 
-func (s *Service) Shorten(userID, originalURL string) (string, error) {
-	code := generateCode(6)
+func (s *ShortenerService) Shorten(userID, originalURL string) (string, error) {
+	code := generateCode(s.shortCodeLength)
 	mapping := model.URLMapping{
 		Code:      code,
 		Original:  originalURL,
@@ -37,7 +49,7 @@ func (s *Service) Shorten(userID, originalURL string) (string, error) {
 	return code, nil
 }
 
-func (s *Service) Resolve(code string) (string, error) {
+func (s *ShortenerService) Resolve(code string) (string, error) {
 	original_url, err := s.store.Get(code)
 	if err != nil || original_url == nil {
 		return "", errors.New("code not found")

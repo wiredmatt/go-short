@@ -1,0 +1,170 @@
+package api
+
+import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestRouter_ShortenEndpoint(t *testing.T) {
+	mockService := &MockShortenerService{}
+	baseURL := "https://short.url"
+
+	// Setup mock expectations
+	mockService.On("Shorten", "user123", "https://example.com/very/long/url").Return("abc123", nil)
+	mockService.On("GetBaseURL").Return(baseURL)
+
+	router := NewRouter(mockService)
+
+	// Create request
+	requestBody := shortenRequest{
+		UserID: "user123",
+		URL:    "https://example.com/very/long/url",
+	}
+	jsonBody, _ := json.Marshal(requestBody)
+
+	req := httptest.NewRequest("POST", "/shorten", bytes.NewBuffer(jsonBody))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	// Call router
+	router.ServeHTTP(w, req)
+
+	// Assertions
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
+
+	var response shortenResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, baseURL+"/abc123", response.ShortURL)
+
+	mockService.AssertExpectations(t)
+}
+
+func TestRouter_ResolveEndpoint(t *testing.T) {
+	mockService := &MockShortenerService{}
+	expectedURL := "https://example.com/very/long/url"
+
+	// Setup mock expectations
+	mockService.On("Resolve", "abc123").Return(expectedURL, nil)
+
+	router := NewRouter(mockService)
+
+	// Create request
+	req := httptest.NewRequest("GET", "/abc123", nil)
+	w := httptest.NewRecorder()
+
+	// Call router
+	router.ServeHTTP(w, req)
+
+	// Assertions
+	assert.Equal(t, http.StatusFound, w.Code)
+	assert.Equal(t, expectedURL, w.Header().Get("Location"))
+
+	mockService.AssertExpectations(t)
+}
+
+func TestRouter_NotFound(t *testing.T) {
+	mockService := &MockShortenerService{}
+	router := NewRouter(mockService)
+
+	// Test non-existent endpoint
+	req := httptest.NewRequest("GET", "/nonexistent/endpoint", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	// Should return 404
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestRouter_MethodNotAllowed(t *testing.T) {
+	mockService := &MockShortenerService{}
+	router := NewRouter(mockService)
+
+	// Setup mock to return error for "shorten" as a code
+	mockService.On("Resolve", "shorten").Return("", assert.AnError)
+
+	// Test wrong method for shorten endpoint
+	req := httptest.NewRequest("GET", "/shorten", nil)
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	// Should return 404 (Chi routes "shorten" as a code parameter)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	mockService.AssertExpectations(t)
+}
+
+func TestRouter_ResolveNotFound(t *testing.T) {
+	mockService := &MockShortenerService{}
+
+	// Setup mock to return error
+	mockService.On("Resolve", "nonexistent").Return("", assert.AnError)
+
+	router := NewRouter(mockService)
+
+	// Create request
+	req := httptest.NewRequest("GET", "/nonexistent", nil)
+	w := httptest.NewRecorder()
+
+	// Call router
+	router.ServeHTTP(w, req)
+
+	// Assertions
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	mockService.AssertExpectations(t)
+}
+
+func TestRouter_ShortenInvalidJSON(t *testing.T) {
+	mockService := &MockShortenerService{}
+	router := NewRouter(mockService)
+
+	// Create request with invalid JSON
+	req := httptest.NewRequest("POST", "/shorten", bytes.NewBufferString("invalid json"))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	// Call router
+	router.ServeHTTP(w, req)
+
+	// Assertions
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, w.Body.String(), "invalid request")
+}
+
+func TestRouter_ShortenServiceError(t *testing.T) {
+	mockService := &MockShortenerService{}
+
+	// Setup mock to return error
+	mockService.On("Shorten", "user123", "https://example.com/very/long/url").Return("", assert.AnError)
+
+	router := NewRouter(mockService)
+
+	// Create request
+	requestBody := shortenRequest{
+		UserID: "user123",
+		URL:    "https://example.com/very/long/url",
+	}
+	jsonBody, _ := json.Marshal(requestBody)
+
+	req := httptest.NewRequest("POST", "/shorten", bytes.NewBuffer(jsonBody))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	// Call router
+	router.ServeHTTP(w, req)
+
+	// Assertions
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Contains(t, w.Body.String(), assert.AnError.Error())
+
+	mockService.AssertExpectations(t)
+}

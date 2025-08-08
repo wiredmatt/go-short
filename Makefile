@@ -45,8 +45,32 @@ run-api:
 run-cli:
 	go run $(CLI_MAIN)
 
+## Test targets
+.PHONY: test
+test:
+	@echo "Running all tests..."
+	go test -v ./...
+
+.PHONY: test-short
+test-short:
+	@echo "Running short tests..."
+	go test -v -short ./...
+
+.PHONY: test-coverage
+test-coverage:
+	@echo "Running tests with coverage..."
+	go test -v -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"
+
+.PHONY: test-benchmark
+test-benchmark:
+	@echo "Running benchmarks..."
+	go test -v -bench=. -benchmem ./...
+
 ## Clean
 .PHONY: clean
 clean:
-	@echo "Cleaning binaries..."
+	@echo "Cleaning binaries and test artifacts..."
 	rm -rf $(BIN_DIR)
+	rm -f coverage.out coverage.html

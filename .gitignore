@@ -2,3 +2,5 @@ tmp
 build
 bin
 .env
+coverage.html
+coverage.out
