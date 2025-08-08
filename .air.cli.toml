@@ -1,0 +1,12 @@
+# .air.toml for CLI
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./bin/cli ./cmd/cli"
+bin = "bin/cli"
+full_bin = "./bin/cli"
+exclude_dir = ["bin", "tmp", "vendor", "cmd/api"]
+
+[log]
+time = true
