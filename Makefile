@@ -50,11 +50,18 @@ run-cli:
 test-e2e:
 	@echo "Running e2e tests..."
 	go test -run Integration ./...
+	@echo "All tests completed."
 
 .PHONY: test-unit
 test-unit:
 	@echo "Running unit tests..."
 	go test -v -short ./...
+	@echo "All tests completed."
+
+## Combined test target
+.PHONY: test
+test: test-unit test-e2e
+	@echo "All tests completed."
 
 .PHONY: test-coverage
 test-coverage:
