@@ -22,15 +22,12 @@ func TestIntegration_ShortenAndResolve(t *testing.T) {
 	router := api.NewRouter(service)
 
 	// Test shortening a URL
-	shortenRequest := struct {
-		UserID string `json:"userId"`
-		URL    string `json:"url"`
-	}{
+	reqBody := api.ShortenRequest{
 		UserID: "user123",
 		URL:    "https://example.com/very/long/url",
 	}
 
-	jsonBody, _ := json.Marshal(shortenRequest)
+	jsonBody, _ := json.Marshal(reqBody)
 	req := httptest.NewRequest("POST", "/shorten", bytes.NewBuffer(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
@@ -40,15 +37,14 @@ func TestIntegration_ShortenAndResolve(t *testing.T) {
 	// Verify shorten response
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var shortenResponse struct {
-		ShortURL string `json:"short_url"`
-	}
-	err := json.Unmarshal(w.Body.Bytes(), &shortenResponse)
+	var res api.ShortenResponse
+
+	err := json.Unmarshal(w.Body.Bytes(), &res)
 	assert.NoError(t, err)
-	assert.Contains(t, shortenResponse.ShortURL, baseURL)
+	assert.Contains(t, res.ShortURL, baseURL)
 
 	// Extract the code from the short URL
-	code := shortenResponse.ShortURL[len(baseURL)+1:] // +1 for the "/"
+	code := res.ShortURL[len(baseURL)+1:] // +1 for the "/"
 	assert.Len(t, code, 6)
 
 	// Test resolving the shortened URL
@@ -98,15 +94,12 @@ func TestIntegration_MultipleShortens(t *testing.T) {
 
 	// Shorten multiple URLs
 	for i, url := range urls {
-		shortenRequest := struct {
-			UserID string `json:"userId"`
-			URL    string `json:"url"`
-		}{
+		reqBody := api.ShortenRequest{
 			UserID: "user123",
 			URL:    url,
 		}
 
-		jsonBody, _ := json.Marshal(shortenRequest)
+		jsonBody, _ := json.Marshal(reqBody)
 		req := httptest.NewRequest("POST", "/shorten", bytes.NewBuffer(jsonBody))
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
@@ -115,13 +108,11 @@ func TestIntegration_MultipleShortens(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var shortenResponse struct {
-			ShortURL string `json:"short_url"`
-		}
-		err := json.Unmarshal(w.Body.Bytes(), &shortenResponse)
+		var res api.ShortenResponse
+		err := json.Unmarshal(w.Body.Bytes(), &res)
 		assert.NoError(t, err)
 
-		code := shortenResponse.ShortURL[len(baseURL)+1:]
+		code := res.ShortURL[len(baseURL)+1:]
 		codes[i] = code
 	}
 

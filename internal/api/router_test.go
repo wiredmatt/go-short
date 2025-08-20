@@ -21,7 +21,7 @@ func TestRouter_ShortenEndpoint(t *testing.T) {
 	router := NewRouter(mockService)
 
 	// Create request
-	requestBody := shortenRequest{
+	requestBody := ShortenRequest{
 		UserID: "user123",
 		URL:    "https://example.com/very/long/url",
 	}
@@ -38,7 +38,7 @@ func TestRouter_ShortenEndpoint(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
 
-	var response shortenResponse
+	var response ShortenResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, baseURL+"/abc123", response.ShortURL)
@@ -149,7 +149,7 @@ func TestRouter_ShortenServiceError(t *testing.T) {
 	router := NewRouter(mockService)
 
 	// Create request
-	requestBody := shortenRequest{
+	requestBody := ShortenRequest{
 		UserID: "user123",
 		URL:    "https://example.com/very/long/url",
 	}

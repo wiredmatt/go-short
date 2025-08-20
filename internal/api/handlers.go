@@ -8,18 +8,18 @@ import (
 	"github.com/wiredmatt/go-backend-template/internal/shortener"
 )
 
-type shortenRequest struct {
+type ShortenRequest struct {
 	UserID string `json:"userId"`
 	URL    string `json:"url"`
 }
 
-type shortenResponse struct {
+type ShortenResponse struct {
 	ShortURL string `json:"short_url"`
 }
 
 func ShortenURL(service shortener.IShortenerService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req shortenRequest
+		var req ShortenRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid request", http.StatusBadRequest)
 			return
@@ -31,7 +31,7 @@ func ShortenURL(service shortener.IShortenerService) http.HandlerFunc {
 			return
 		}
 
-		resp := shortenResponse{ShortURL: service.GetBaseURL() + "/" + code}
+		resp := ShortenResponse{ShortURL: service.GetBaseURL() + "/" + code}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
 	}

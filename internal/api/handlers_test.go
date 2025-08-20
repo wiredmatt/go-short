@@ -42,7 +42,7 @@ func TestShortenURL_Success(t *testing.T) {
 	mockService.On("GetBaseURL").Return(baseURL)
 
 	// Create request
-	requestBody := shortenRequest{
+	requestBody := ShortenRequest{
 		UserID: "user123",
 		URL:    "https://example.com/very/long/url",
 	}
@@ -60,7 +60,7 @@ func TestShortenURL_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
 
-	var response shortenResponse
+	var response ShortenResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, baseURL+"/abc123", response.ShortURL)
@@ -92,7 +92,7 @@ func TestShortenURL_ServiceError(t *testing.T) {
 	mockService.On("Shorten", "user123", "https://example.com/very/long/url").Return("", assert.AnError)
 
 	// Create request
-	requestBody := shortenRequest{
+	requestBody := ShortenRequest{
 		UserID: "user123",
 		URL:    "https://example.com/very/long/url",
 	}
@@ -210,12 +210,12 @@ func TestResolveURL_EmptyCode(t *testing.T) {
 func TestShortenRequest_Validation(t *testing.T) {
 	tests := []struct {
 		name        string
-		requestBody shortenRequest
+		requestBody ShortenRequest
 		expectError bool
 	}{
 		{
 			name: "valid request",
-			requestBody: shortenRequest{
+			requestBody: ShortenRequest{
 				UserID: "user123",
 				URL:    "https://example.com/very/long/url",
 			},
@@ -223,7 +223,7 @@ func TestShortenRequest_Validation(t *testing.T) {
 		},
 		{
 			name: "empty user ID",
-			requestBody: shortenRequest{
+			requestBody: ShortenRequest{
 				UserID: "",
 				URL:    "https://example.com/very/long/url",
 			},
@@ -231,7 +231,7 @@ func TestShortenRequest_Validation(t *testing.T) {
 		},
 		{
 			name: "empty URL",
-			requestBody: shortenRequest{
+			requestBody: ShortenRequest{
 				UserID: "user123",
 				URL:    "",
 			},
