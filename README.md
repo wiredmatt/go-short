@@ -11,16 +11,15 @@ AI was used in this project to create tests, add comments and generate documenta
 - URL shortening with customizable short codes
 - URL resolution with redirects
 - In-memory storage (extensible to other storage backends)
-- RESTful API with Chi router
+- RESTful API with Go's servemux
+- Fully documented API thanks to huma
 - Comprehensive test suite with 100% coverage
 - Benchmark tests for performance monitoring
 - Centralized configuration management
 
 ## TODO
 
-- add [huma](https://github.com/danielgtaylor/huma) to allow automatic generation of openapi spec from code.
 - dockerize app.
-- define postgres and redis stores.
 - kubernetes deployment
 - [opentelemetry](https://opentelemetry.io/docs/languages/go/getting-started/) or [prometheus](https://prometheus.io/docs/guides/go-application/) and [graphana](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-golang/)
 
@@ -99,6 +98,10 @@ make test-benchmark    # Run benchmark tests
 ```sh
 make clean
 ```
+
+## API Docs
+
+API docs are avaiable at http://localhost:3000/docs
 
 ## API Endpoints
 

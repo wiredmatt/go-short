@@ -42,7 +42,8 @@ func main() {
 
 	// Start server in a goroutine
 	go func() {
-		log.Printf("Starting API server on %s", cfg.GetServerAddress())
+		log.Printf("Starting API server on http://%s", cfg.GetServerAddress())
+		log.Printf("API docs available at http://%s/docs", cfg.GetServerAddress())
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
 		}
