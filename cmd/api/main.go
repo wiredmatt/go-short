@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/wiredmatt/go-short/cmd/api/app"
 	"github.com/wiredmatt/go-short/internal/config"
 )
 
@@ -21,7 +22,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	app, err := NewApp(ctx, cfg)
+	app, err := app.NewApp(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Failed to initialize app: %v", err)
 	}
