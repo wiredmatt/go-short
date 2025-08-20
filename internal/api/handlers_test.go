@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// MockShortenerService is a mock implementation of the shortener.IShortenerService
+// MockShortenerService is a mock implementation of the shortener.Shortener
 type MockShortenerService struct {
 	mock.Mock
 }

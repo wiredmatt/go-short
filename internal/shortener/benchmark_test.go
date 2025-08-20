@@ -10,7 +10,6 @@ import (
 	"github.com/wiredmatt/go-backend-template/internal/storage"
 )
 
-// BenchmarkStore is a mock store for benchmarking
 type BenchmarkStore struct {
 	mock.Mock
 }
@@ -52,7 +51,6 @@ func BenchmarkShorten(b *testing.B) {
 	userID := "user123"
 	originalURL := "https://example.com/very/long/url"
 
-	// Setup mock expectations
 	mockStore.On("Save", mock.AnythingOfType("model.URLMapping")).Return(nil)
 
 	b.ResetTimer()
@@ -74,7 +72,6 @@ func BenchmarkResolve(b *testing.B) {
 	code := "abc123"
 	expectedURL := "https://example.com/very/long/url"
 
-	// Setup mock expectations
 	mockStore.On("Get", code).Return(&expectedURL, nil)
 
 	b.ResetTimer()

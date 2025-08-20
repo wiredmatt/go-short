@@ -9,8 +9,8 @@ import (
 	"github.com/wiredmatt/go-backend-template/internal/storage"
 )
 
-// Service defines the interface for URL shortening operations
-type IShortenerService interface {
+// Shortener defines the interface for URL shortening operations
+type Shortener interface {
 	GetBaseURL() string
 	Shorten(userID, originalURL string) (string, error)
 	Resolve(code string) (string, error)

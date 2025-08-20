@@ -10,14 +10,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Config holds all application configuration
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	App      AppConfig
 }
 
-// ServerConfig holds server-related configuration
 type ServerConfig struct {
 	Port         string
 	Host         string
@@ -26,13 +24,10 @@ type ServerConfig struct {
 	IdleTimeout  time.Duration
 }
 
-// DatabaseConfig holds database-related configuration
 type DatabaseConfig struct {
 	Type string // "memory", "postgres", "redis"
-	// Add other database-specific configs as needed
 }
 
-// AppConfig holds application-specific configuration
 type AppConfig struct {
 	BaseURL         string
 	Environment     string
@@ -42,9 +37,8 @@ type AppConfig struct {
 
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
-	// Load .env file if it exists
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using environment variables")
+		log.Println("No .env file found, using system environment variables")
 	}
 
 	config := &Config{
@@ -66,7 +60,6 @@ func Load() (*Config, error) {
 		},
 	}
 
-	// Validate configuration
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("configuration validation failed: %w", err)
 	}
@@ -76,7 +69,6 @@ func Load() (*Config, error) {
 
 // LoadForTest loads configuration from .env.test file for testing
 func LoadForTest() (*Config, error) {
-	// Load .env.test file if it exists
 	if err := godotenv.Load(".env.test"); err != nil {
 		log.Println("No .env.test file found, using environment variables")
 	}
@@ -100,7 +92,6 @@ func LoadForTest() (*Config, error) {
 		},
 	}
 
-	// Validate configuration
 	if err := config.Validate(); err != nil {
 		return nil, fmt.Errorf("configuration validation failed: %w", err)
 	}
@@ -108,7 +99,6 @@ func LoadForTest() (*Config, error) {
 	return config, nil
 }
 
-// Validate validates the configuration
 func (c *Config) Validate() error {
 	if c.App.BaseURL == "" {
 		return fmt.Errorf("BASE_URL is required")
@@ -125,22 +115,18 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// GetServerAddress returns the full server address
 func (c *Config) GetServerAddress() string {
 	return fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port)
 }
 
-// IsDevelopment returns true if the environment is development
 func (c *Config) IsDevelopment() bool {
 	return c.App.Environment == "development"
 }
 
-// IsProduction returns true if the environment is production
 func (c *Config) IsProduction() bool {
 	return c.App.Environment == "production"
 }
 
-// IsTest returns true if the environment is test
 func (c *Config) IsTest() bool {
 	return c.App.Environment == "test"
 }
@@ -184,7 +170,6 @@ func getDurationEnv(key string, defaultValue time.Duration) time.Duration {
 	return defaultValue
 }
 
-// GetBoolEnv gets a boolean environment variable
 func getBoolEnv(key string, defaultValue bool) bool {
 	if value := os.Getenv(key); value != "" {
 		if boolValue, err := strconv.ParseBool(value); err == nil {

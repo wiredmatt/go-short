@@ -74,7 +74,6 @@ func TestShorten_Success(t *testing.T) {
 	userID := "user123"
 	originalURL := "https://example.com/very/long/url"
 
-	// Expect the store to be called with a URLMapping
 	mockStore.On("Save", mock.AnythingOfType("model.URLMapping")).Return(nil)
 
 	code, err := service.Shorten(userID, originalURL)
@@ -83,7 +82,6 @@ func TestShorten_Success(t *testing.T) {
 	assert.NotEmpty(t, code)
 	assert.Len(t, code, shortCodeLength) // Should be configured length
 
-	// Verify the mock was called correctly
 	mockStore.AssertExpectations(t)
 }
 
@@ -97,7 +95,6 @@ func TestShorten_StoreError(t *testing.T) {
 	originalURL := "https://example.com/very/long/url"
 	expectedError := errors.New("storage error")
 
-	// Expect the store to return an error
 	mockStore.On("Save", mock.AnythingOfType("model.URLMapping")).Return(expectedError)
 
 	code, err := service.Shorten(userID, originalURL)
@@ -118,7 +115,6 @@ func TestResolve_Success(t *testing.T) {
 	code := "abc123"
 	expectedURL := "https://example.com/very/long/url"
 
-	// Expect the store to return the original URL
 	mockStore.On("Get", code).Return(&expectedURL, nil)
 
 	originalURL, err := service.Resolve(code)
@@ -138,7 +134,6 @@ func TestResolve_NotFound(t *testing.T) {
 	code := "nonexistent"
 	expectedError := errors.New("code not found")
 
-	// Expect the store to return an error
 	mockStore.On("Get", code).Return(nil, expectedError)
 
 	originalURL, err := service.Resolve(code)
@@ -171,7 +166,6 @@ func TestResolve_NilURL(t *testing.T) {
 }
 
 func TestGenerateCode(t *testing.T) {
-	// Test that generateCode produces codes of the correct length
 	length := 6
 	code := generateCode(length)
 
@@ -197,7 +191,6 @@ func TestShorten_GeneratesUniqueCodes(t *testing.T) {
 	userID := "user123"
 	originalURL := "https://example.com/very/long/url"
 
-	// Expect the store to be called multiple times
 	mockStore.On("Save", mock.AnythingOfType("model.URLMapping")).Return(nil)
 
 	codes := make(map[string]bool)

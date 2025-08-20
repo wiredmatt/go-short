@@ -72,7 +72,6 @@ func TestIntegration_ResolveNonExistent(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	// Should return 404
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 

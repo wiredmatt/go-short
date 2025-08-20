@@ -16,7 +16,7 @@ type ShortenResponse struct {
 	ShortURL string `json:"short_url"`
 }
 
-func ShortenURL(service shortener.IShortenerService) http.HandlerFunc {
+func ShortenURL(service shortener.Shortener) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req ShortenRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -36,7 +36,7 @@ func ShortenURL(service shortener.IShortenerService) http.HandlerFunc {
 	}
 }
 
-func ResolveURL(service shortener.IShortenerService) http.HandlerFunc {
+func ResolveURL(service shortener.Shortener) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := r.PathValue("code")
 		originalURL, err := service.Resolve(code)
