@@ -19,14 +19,22 @@ func TestPostgresStore(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	assert.NoError(t, err)
 
 	store, err := NewPostgresStore(ctx, cfg.Database.ConnectionString)
 	if err != nil {
 		panic(err)
 	}
+	assert.NoError(t, err)
 
-	defer store.Close()
-	defer ResetPostgresStore(cfg.Database.ConnectionString)
+	cleanup := func() {
+		store.Close()
+		err := ResetPostgresStore(cfg.Database.ConnectionString)
+
+		assert.NoError(t, err)
+	}
+
+	defer cleanup()
 
 	t.Run("Save and Get", func(t *testing.T) {
 		mapping := model.URLMapping{
