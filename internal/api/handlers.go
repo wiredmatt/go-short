@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/wiredmatt/go-backend-template/internal/shortener"
 )
 
@@ -39,7 +38,7 @@ func ShortenURL(service shortener.IShortenerService) http.HandlerFunc {
 
 func ResolveURL(service shortener.IShortenerService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		code := chi.URLParam(r, "code")
+		code := r.PathValue("code")
 		originalURL, err := service.Resolve(code)
 		if err != nil {
 			http.NotFound(w, r)

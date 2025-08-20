@@ -2,13 +2,11 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -137,18 +135,13 @@ func TestResolveURL_Success(t *testing.T) {
 	// Setup mock expectations
 	mockService.On("Resolve", "abc123").Return(expectedURL, nil)
 
-	// Create request
+	// Create router and request
+	router := NewRouter(mockService)
 	req := httptest.NewRequest("GET", "/abc123", nil)
 	w := httptest.NewRecorder()
 
-	// Setup chi router context
-	rctx := chi.NewRouteContext()
-	rctx.URLParams.Add("code", "abc123")
-	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-	// Call handler
-	handler := ResolveURL(mockService)
-	handler.ServeHTTP(w, req)
+	// Call router
+	router.ServeHTTP(w, req)
 
 	// Assertions
 	assert.Equal(t, http.StatusFound, w.Code)
@@ -163,18 +156,13 @@ func TestResolveURL_NotFound(t *testing.T) {
 	// Setup mock to return error
 	mockService.On("Resolve", "nonexistent").Return("", assert.AnError)
 
-	// Create request
+	// Create router and request
+	router := NewRouter(mockService)
 	req := httptest.NewRequest("GET", "/nonexistent", nil)
 	w := httptest.NewRecorder()
 
-	// Setup chi router context
-	rctx := chi.NewRouteContext()
-	rctx.URLParams.Add("code", "nonexistent")
-	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-	// Call handler
-	handler := ResolveURL(mockService)
-	handler.ServeHTTP(w, req)
+	// Call router
+	router.ServeHTTP(w, req)
 
 	// Assertions
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -185,26 +173,16 @@ func TestResolveURL_NotFound(t *testing.T) {
 func TestResolveURL_EmptyCode(t *testing.T) {
 	mockService := &MockShortenerService{}
 
-	// Setup mock to return error for empty code
-	mockService.On("Resolve", "").Return("", assert.AnError)
-
-	// Create request with empty code
+	// Create router and request with empty code
+	router := NewRouter(mockService)
 	req := httptest.NewRequest("GET", "/", nil)
 	w := httptest.NewRecorder()
 
-	// Setup chi router context with empty code
-	rctx := chi.NewRouteContext()
-	rctx.URLParams.Add("code", "")
-	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+	// Call router
+	router.ServeHTTP(w, req)
 
-	// Call handler
-	handler := ResolveURL(mockService)
-	handler.ServeHTTP(w, req)
-
-	// Assertions
+	// Assertions - should return 404 since "/" doesn't match "/{code}" pattern
 	assert.Equal(t, http.StatusNotFound, w.Code)
-
-	mockService.AssertExpectations(t)
 }
 
 func TestShortenRequest_Validation(t *testing.T) {

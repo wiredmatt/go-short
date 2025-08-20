@@ -96,7 +96,7 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	// Should return 404 (Chi routes "shorten" as a code parameter)
+	// Should return 404
 	assert.Equal(t, http.StatusNotFound, w.Code)
 
 	mockService.AssertExpectations(t)

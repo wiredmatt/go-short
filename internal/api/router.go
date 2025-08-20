@@ -1,13 +1,14 @@
 package api
 
 import (
-	"github.com/go-chi/chi/v5"
+	"net/http"
+
 	"github.com/wiredmatt/go-backend-template/internal/shortener"
 )
 
-func NewRouter(service shortener.IShortenerService) *chi.Mux {
-	r := chi.NewRouter()
-	r.Post("/shorten", ShortenURL(service))
-	r.Get("/{code}", ResolveURL(service))
+func NewRouter(service shortener.IShortenerService) *http.ServeMux {
+	r := http.NewServeMux()
+	r.HandleFunc("POST /shorten", ShortenURL(service))
+	r.HandleFunc("GET /{code}", ResolveURL(service))
 	return r
 }
