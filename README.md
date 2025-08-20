@@ -1,4 +1,4 @@
-# go-backend-template
+# go-short
 
 A URL shortener service built with Go, featuring a clean architecture with comprehensive test coverage.
 
@@ -27,22 +27,22 @@ AI was used in this project to create tests, add comments and generate documenta
 
 - golang >= 1.24.4
 - air >= v1.62.0 (install with `go install github.com/air-verse/air@latest`)
-- testify
+- make
 
 ## Configuration
 
 The application uses environment variables for configuration. Create a `.env` file in the root directory:
 
 ```env
-# Required
-BASE_URL=https://your-domain.com
-
 # Optional (with defaults)
+
+BASE_URL=https://your-domain.com
 PORT=3000
 HOST=0.0.0.0
 ENVIRONMENT=development
 LOG_LEVEL=info
 SHORT_CODE_LENGTH=6
+DB_CONNECTION_STRING=postgres://user:password@localhost:5432/shortener
 DB_TYPE=memory # memory | postgres
 
 # Server timeouts
@@ -62,6 +62,7 @@ IDLE_TIMEOUT=60s
 | `LOG_LEVEL`         | No       | `info`        | Logging level                             |
 | `SHORT_CODE_LENGTH` | No       | `6`           | Length of generated short codes (3-20)    |
 | `DB_TYPE`           | No       | `memory`      | Database type (memory/postgres/redis)     |
+| `DB_TYPE`           | No       | `postgres://user:password@localhost:5432/shortener`       | Database Connection String                |
 | `READ_TIMEOUT`      | No       | `30s`         | HTTP read timeout                         |
 | `WRITE_TIMEOUT`     | No       | `30s`         | HTTP write timeout                        |
 | `IDLE_TIMEOUT`      | No       | `60s`         | HTTP idle timeout                         |
