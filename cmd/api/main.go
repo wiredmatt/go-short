@@ -28,7 +28,7 @@ func main() {
 	// Setup service
 	shortService := shortener.NewService(memStore, cfg.App.BaseURL, cfg.App.ShortCodeLength)
 
-	// Setup API router
+	// Setup API router (initializes Huma & registers routes)
 	router := api.NewRouter(shortService)
 
 	// Create HTTP server with configuration
@@ -65,4 +65,5 @@ func main() {
 	}
 
 	log.Println("Server exited")
+
 }

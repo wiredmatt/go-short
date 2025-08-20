@@ -192,13 +192,6 @@ func (p *PostgresStore) Delete(code string) error {
 	return nil
 }
 
-// Close closes the database connection pool
-func (p *PostgresStore) Close() {
-	if p.pool != nil {
-		p.pool.Close()
-	}
-}
-
 // CleanupExpired removes expired URL mappings
 func (p *PostgresStore) CleanupExpired() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -208,4 +201,10 @@ func (p *PostgresStore) CleanupExpired() error {
 
 	_, err := p.pool.Exec(ctx, query)
 	return err
+}
+
+func (p *PostgresStore) Close() {
+	if p.pool != nil {
+		p.pool.Close()
+	}
 }

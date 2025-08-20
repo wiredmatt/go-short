@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/wiredmatt/go-backend-template/internal/config"
@@ -188,14 +189,15 @@ func TestPostgresStore(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Nil(t, original)
 	})
-}
 
-// getTestConnString returns the PostgreSQL connection string for testing
-// In a real environment, this would come from environment variables
-func getTestConnString() string {
-	// You can set this via environment variable for testing
-	// return os.Getenv("TEST_POSTGRES_CONN_STRING")
+	t.Cleanup(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
 
-	// For now, return empty to skip tests
-	return ""
+		pool, err := pgxpool.New(ctx, cfg.Database.ConnectionString)
+		if err == nil {
+			defer pool.Close()
+			_, _ = pool.Exec(ctx, "TRUNCATE TABLE url_mappings")
+		}
+	})
 }

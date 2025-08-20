@@ -1,14 +1,88 @@
 package api
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/danielgtaylor/huma/v2"
+	humago "github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/wiredmatt/go-backend-template/internal/shortener"
 )
 
+type HealthOutput struct {
+	Body struct {
+		Status string `json:"status" example:"ok"`
+	}
+	Status int `json:"status" example:"200"`
+}
+
+type ShortenInput struct {
+	Body struct {
+		UserID string `json:"userId"`
+		URL    string `json:"url"`
+	}
+}
+type ShortenOutput struct {
+	Body struct {
+		ShortURL string `json:"short_url"`
+	}
+	Status int `json:"status" example:"200"`
+}
+
+type ResolveInput struct {
+	Code string `path:"code"`
+}
+type ResolveOutput struct {
+	Location string `header:"Location"`
+	Status   int    `json:"status" example:"302"`
+}
+
 func NewRouter(service shortener.Shortener) *http.ServeMux {
 	r := http.NewServeMux()
-	r.HandleFunc("POST /shorten", ShortenURL(service))
-	r.HandleFunc("GET /{code}", ResolveURL(service))
+
+	// Initialize Huma on this mux
+	humaAPI := humago.New(r, huma.DefaultConfig("URL Shortener API", "1.0.0"))
+
+	huma.Register(humaAPI, huma.Operation{
+		Method:  http.MethodGet,
+		Path:    "/health",
+		Summary: "Health check",
+	}, func(ctx context.Context, _ *struct{}) (*HealthOutput, error) {
+		res := &HealthOutput{}
+		res.Body.Status = "ok"
+		res.Status = http.StatusOK
+		return res, nil
+	})
+
+	huma.Register(humaAPI, huma.Operation{
+		Method:  http.MethodPost,
+		Path:    "/shorten",
+		Summary: "Create a shortened URL",
+	}, func(ctx context.Context, in *ShortenInput) (*ShortenOutput, error) {
+		code, err := service.Shorten(in.Body.UserID, in.Body.URL)
+		if err != nil {
+			return nil, huma.NewError(http.StatusInternalServerError, err.Error())
+		}
+		var out ShortenOutput
+		out.Body.ShortURL = service.GetBaseURL() + "/" + code
+		out.Status = http.StatusOK
+		return &out, nil
+	})
+
+	huma.Register(humaAPI, huma.Operation{
+		Method:  http.MethodGet,
+		Path:    "/{code}",
+		Summary: "Resolve a shortened URL",
+	}, func(ctx context.Context, in *ResolveInput) (*ResolveOutput, error) {
+		originalURL, err := service.Resolve(in.Code)
+		if err != nil || originalURL == "" {
+			return nil, huma.NewError(http.StatusNotFound, "not found")
+		}
+		return &ResolveOutput{
+			Location: originalURL,
+			Status:   http.StatusFound,
+		}, nil
+	})
+
 	return r
 }
