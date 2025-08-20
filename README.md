@@ -10,10 +10,10 @@ AI was used in this project to create tests, add comments and generate documenta
 
 - URL shortening with customizable short codes
 - URL resolution with redirects
-- In-memory storage (extensible to other storage backends)
+- In-memory & PostgreSQL storage (extensible to other storage backends)
 - RESTful API with Go's servemux
 - Fully documented API thanks to huma
-- Comprehensive test suite with 100% coverage
+- Comprehensive test suite with >80% coverage
 - Benchmark tests for performance monitoring
 - Centralized configuration management
 
@@ -141,14 +141,13 @@ The codebase includes comprehensive tests covering:
 
 ```sh
 # Run all tests
-go test -v ./...
+make test
 
 # Run tests with coverage
-go test -v -coverprofile=coverage.out ./...
-go tool cover -html=coverage.out -o coverage.html
+make test-coverage
 
 # Run benchmarks
-go test -v -bench=. -benchmem ./...
+make test-benchmark
 ```
 
 ### Test Configuration
