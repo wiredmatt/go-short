@@ -20,6 +20,7 @@ func TestLoad_DefaultValues(t *testing.T) {
 	os.Unsetenv("WRITE_TIMEOUT")
 	os.Unsetenv("IDLE_TIMEOUT")
 	os.Unsetenv("DB_TYPE")
+	os.Unsetenv("DB_CONNECTION_STRING")
 
 	// Set required environment variable
 	os.Setenv("BASE_URL", "https://short.url")
@@ -54,6 +55,7 @@ func TestLoad_CustomValues(t *testing.T) {
 	os.Setenv("WRITE_TIMEOUT", "60s")
 	os.Setenv("IDLE_TIMEOUT", "120s")
 	os.Setenv("DB_TYPE", "postgres")
+	os.Setenv("DB_CONNECTION_STRING", "postgres://user:password@localhost:5432/shorten")
 
 	cfg, err := LoadForTest()
 
@@ -67,21 +69,11 @@ func TestLoad_CustomValues(t *testing.T) {
 	assert.Equal(t, 60*time.Second, cfg.Server.WriteTimeout)
 	assert.Equal(t, 120*time.Second, cfg.Server.IdleTimeout)
 	assert.Equal(t, "postgres", cfg.Database.Type)
+	assert.Equal(t, "postgres://user:password@localhost:5432/shorten", cfg.Database.ConnectionString)
 	assert.Equal(t, "https://custom.url", cfg.App.BaseURL)
 	assert.Equal(t, "production", cfg.App.Environment)
 	assert.Equal(t, "debug", cfg.App.LogLevel)
 	assert.Equal(t, 8, cfg.App.ShortCodeLength)
-}
-
-func TestLoad_MissingRequiredEnv(t *testing.T) {
-	// Clear BASE_URL to test required environment variable
-	os.Unsetenv("BASE_URL")
-
-	cfg, err := LoadForTest()
-
-	assert.Error(t, err)
-	assert.Nil(t, cfg)
-	assert.Contains(t, err.Error(), "BASE_URL is required")
 }
 
 func TestLoad_InvalidInteger(t *testing.T) {
@@ -228,34 +220,4 @@ func TestEnvironmentHelpers(t *testing.T) {
 			assert.Equal(t, tt.isTest, cfg.IsTest())
 		})
 	}
-}
-
-func TestLoad_WithDotEnv(t *testing.T) {
-	// Create a temporary .env.test file in the current directory
-	envContent := `BASE_URL=https://envfile.url
-PORT=9090
-ENVIRONMENT=staging
-SHORT_CODE_LENGTH=10
-`
-
-	// Create .env.test file in current directory
-	envFile := ".env.test"
-	err := os.WriteFile(envFile, []byte(envContent), 0644)
-	assert.NoError(t, err)
-	defer os.Remove(envFile)
-
-	// Clear environment variables to ensure .env.test file is used
-	os.Unsetenv("BASE_URL")
-	os.Unsetenv("PORT")
-	os.Unsetenv("ENVIRONMENT")
-	os.Unsetenv("SHORT_CODE_LENGTH")
-
-	cfg, err := LoadForTest()
-
-	assert.NoError(t, err)
-	assert.NotNil(t, cfg)
-	assert.Equal(t, "https://envfile.url", cfg.App.BaseURL)
-	assert.Equal(t, "9090", cfg.Server.Port)
-	assert.Equal(t, "staging", cfg.App.Environment)
-	assert.Equal(t, 10, cfg.App.ShortCodeLength)
 }

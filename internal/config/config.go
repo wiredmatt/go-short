@@ -25,7 +25,8 @@ type ServerConfig struct {
 }
 
 type DatabaseConfig struct {
-	Type string // "memory", "postgres", "redis"
+	Type             string // "memory", "postgres", "redis"
+	ConnectionString string
 }
 
 type AppConfig struct {
@@ -82,10 +83,11 @@ func LoadForTest() (*Config, error) {
 			IdleTimeout:  getDurationEnv("IDLE_TIMEOUT", 60*time.Second),
 		},
 		Database: DatabaseConfig{
-			Type: getEnv("DB_TYPE", "memory"),
+			Type:             getEnv("DB_TYPE", "memory"),
+			ConnectionString: getEnv("DB_CONNECTION_STRING", "postgres://user:password@localhost:5432/shortener"),
 		},
 		App: AppConfig{
-			BaseURL:         getRequiredEnv("BASE_URL"),
+			BaseURL:         getEnv("BASE_URL", "http://localhost:3000"),
 			Environment:     getEnv("ENVIRONMENT", "development"),
 			LogLevel:        getEnv("LOG_LEVEL", "info"),
 			ShortCodeLength: getIntEnv("SHORT_CODE_LENGTH", 6),
