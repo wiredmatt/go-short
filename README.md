@@ -43,7 +43,7 @@ HOST=0.0.0.0
 ENVIRONMENT=development
 LOG_LEVEL=info
 SHORT_CODE_LENGTH=6
-DB_TYPE=memory
+DB_TYPE=memory # memory | postgres
 
 # Server timeouts
 READ_TIMEOUT=30s
@@ -53,40 +53,50 @@ IDLE_TIMEOUT=60s
 
 ### Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `BASE_URL` | Yes | - | Base URL for shortened links |
-| `PORT` | No | `3000` | Server port |
-| `HOST` | No | `0.0.0.0` | Server host |
-| `ENVIRONMENT` | No | `development` | Environment (development/production/test) |
-| `LOG_LEVEL` | No | `info` | Logging level |
-| `SHORT_CODE_LENGTH` | No | `6` | Length of generated short codes (3-20) |
-| `DB_TYPE` | No | `memory` | Database type (memory/postgres/redis) |
-| `READ_TIMEOUT` | No | `30s` | HTTP read timeout |
-| `WRITE_TIMEOUT` | No | `30s` | HTTP write timeout |
-| `IDLE_TIMEOUT` | No | `60s` | HTTP idle timeout |
+| Variable            | Required | Default       | Description                               |
+| ------------------- | -------- | ------------- | ----------------------------------------- |
+| `BASE_URL`          | Yes      | -             | Base URL for shortened links              |
+| `PORT`              | No       | `3000`        | Server port                               |
+| `HOST`              | No       | `0.0.0.0`     | Server host                               |
+| `ENVIRONMENT`       | No       | `development` | Environment (development/production/test) |
+| `LOG_LEVEL`         | No       | `info`        | Logging level                             |
+| `SHORT_CODE_LENGTH` | No       | `6`           | Length of generated short codes (3-20)    |
+| `DB_TYPE`           | No       | `memory`      | Database type (memory/postgres/redis)     |
+| `READ_TIMEOUT`      | No       | `30s`         | HTTP read timeout                         |
+| `WRITE_TIMEOUT`     | No       | `30s`         | HTTP write timeout                        |
+| `IDLE_TIMEOUT`      | No       | `60s`         | HTTP idle timeout                         |
 
 ## Commands
 
 ### Development
+
+```sh
+docker-compose up -d # (optional) if you want to run with postgres, otherwise set DB_TYPE=memory
+                     # note that if you run tests without a postgres instance running, some of
+                     # them may fail.
+```
+
 ```sh
 make dev-api    # requires air to be installed
 make dev-cli    # requires air to be installed
 ```
 
 ### Building
+
 ```sh
 make build-api
 make build-cli
 ```
 
 ### Running
+
 ```sh
 make run-api
 make run-cli
 ```
 
 ### Testing
+
 ```sh
 make test              # Run all tests
 make test-short        # Run short tests only
@@ -95,6 +105,7 @@ make test-benchmark    # Run benchmark tests
 ```
 
 ### Cleanup
+
 ```sh
 make clean
 ```
@@ -120,7 +131,7 @@ The codebase includes comprehensive tests covering:
 ### Test Coverage
 
 - **API Layer**: 100% coverage
-- **Service Layer**: 100% coverage  
+- **Service Layer**: 100% coverage
 - **Storage Layer**: 100% coverage
 - **Model Layer**: 100% coverage
 - **Config Layer**: 100% coverage

@@ -46,27 +46,27 @@ run-cli:
 	go run $(CLI_MAIN)
 
 ## Test targets
-.PHONY: test
-test:
-	@echo "Running all tests..."
-	go test -v ./...
+.PHONY: test-e2e
+test-e2e:
+	@echo "Running e2e tests..."
+	go test -run Integration ./...
 
-.PHONY: test-short
-test-short:
-	@echo "Running short tests..."
+.PHONY: test-unit
+test-unit:
+	@echo "Running unit tests..."
 	go test -v -short ./...
 
 .PHONY: test-coverage
 test-coverage:
 	@echo "Running tests with coverage..."
-	go test -v -coverprofile=coverage.out ./...
+	go test -v -short -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
 .PHONY: test-benchmark
 test-benchmark:
 	@echo "Running benchmarks..."
-	go test -v -bench=. -benchmem ./...
+	go test -v -short -bench=. -benchmem ./...
 
 ## Clean
 .PHONY: clean

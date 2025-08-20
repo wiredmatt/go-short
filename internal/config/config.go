@@ -51,10 +51,11 @@ func Load() (*Config, error) {
 			IdleTimeout:  getDurationEnv("IDLE_TIMEOUT", 60*time.Second),
 		},
 		Database: DatabaseConfig{
-			Type: getEnv("DB_TYPE", "memory"),
+			Type:             getEnv("DB_TYPE", "postgres"),
+			ConnectionString: getEnv("DB_CONNECTION_STRING", "postgres://user:password@localhost:5432/shortener"),
 		},
 		App: AppConfig{
-			BaseURL:         getRequiredEnv("BASE_URL"),
+			BaseURL:         getEnv("BASE_URL", fmt.Sprintf("http://%s:%s", getEnv("HOST", "0.0.0.0"), getEnv("PORT", "3000"))),
 			Environment:     getEnv("ENVIRONMENT", "development"),
 			LogLevel:        getEnv("LOG_LEVEL", "info"),
 			ShortCodeLength: getIntEnv("SHORT_CODE_LENGTH", 6),
@@ -140,16 +141,6 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
-}
-
-func getRequiredEnv(key string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		// In test environment, we want to return empty string and let validation handle it
-		// This prevents log.Fatalf from terminating tests
-		return ""
-	}
-	return value
 }
 
 func getIntEnv(key string, defaultValue int) int {

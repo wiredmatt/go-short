@@ -9,42 +9,28 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/wiredmatt/go-backend-template/internal/api"
 	"github.com/wiredmatt/go-backend-template/internal/config"
-	"github.com/wiredmatt/go-backend-template/internal/shortener"
-	"github.com/wiredmatt/go-backend-template/internal/storage"
 )
 
 func main() {
-	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
-	// Setup storage (in-memory for now)
-	memStore := storage.NewMemoryStore()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
-	// Setup service
-	shortService := shortener.NewService(memStore, cfg.App.BaseURL, cfg.App.ShortCodeLength)
-
-	// Setup API router (initializes Huma & registers routes)
-	router := api.NewRouter(shortService)
-
-	// Create HTTP server with configuration
-	server := &http.Server{
-		Addr:         cfg.GetServerAddress(),
-		Handler:      router,
-		ReadTimeout:  cfg.Server.ReadTimeout,
-		WriteTimeout: cfg.Server.WriteTimeout,
-		IdleTimeout:  cfg.Server.IdleTimeout,
+	app, err := NewApp(ctx, cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize app: %v", err)
 	}
 
 	// Start server in a goroutine
 	go func() {
 		log.Printf("Starting API server on http://%s", cfg.GetServerAddress())
 		log.Printf("API docs available at http://%s/docs", cfg.GetServerAddress())
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := app.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
 		}
 	}()
@@ -56,15 +42,10 @@ func main() {
 
 	log.Println("Shutting down server...")
 
-	// Create a deadline for server shutdown
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
 	// Attempt graceful shutdown
-	if err := server.Shutdown(ctx); err != nil {
+	if err := app.Server.Shutdown(ctx); err != nil {
 		log.Fatalf("Server forced to shutdown: %v", err)
 	}
 
 	log.Println("Server exited")
-
 }

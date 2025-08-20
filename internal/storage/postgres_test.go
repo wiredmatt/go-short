@@ -5,22 +5,28 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/wiredmatt/go-backend-template/internal/config"
 	"github.com/wiredmatt/go-backend-template/internal/model"
 )
 
 func TestPostgresStore(t *testing.T) {
 	cfg, err := config.LoadForTest()
-
 	assert.NoError(t, err)
 
 	ctx := context.Background()
+	err = ResetPostgresStore(cfg.Database.ConnectionString)
+	if err != nil {
+		panic(err)
+	}
+
 	store, err := NewPostgresStore(ctx, cfg.Database.ConnectionString)
-	require.NoError(t, err)
+	if err != nil {
+		panic(err)
+	}
+
 	defer store.Close()
+	defer ResetPostgresStore(cfg.Database.ConnectionString)
 
 	t.Run("Save and Get", func(t *testing.T) {
 		mapping := model.URLMapping{
@@ -188,16 +194,5 @@ func TestPostgresStore(t *testing.T) {
 		original, err := store.Get("cleanuptest")
 		assert.NoError(t, err)
 		assert.Nil(t, original)
-	})
-
-	t.Cleanup(func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		pool, err := pgxpool.New(ctx, cfg.Database.ConnectionString)
-		if err == nil {
-			defer pool.Close()
-			_, _ = pool.Exec(ctx, "TRUNCATE TABLE url_mappings")
-		}
 	})
 }

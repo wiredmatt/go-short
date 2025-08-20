@@ -30,6 +30,32 @@ func (m *MockShortenerService) Resolve(code string) (string, error) {
 	return args.String(0), args.Error(1)
 }
 
+func TestRouter_HealthEndpoint(t *testing.T) {
+	mockService := &MockShortenerService{}
+
+	router := NewRouter(mockService)
+
+	req := httptest.NewRequest("GET", "/health", nil)
+	req.Header.Set("Accept", "application/json")
+	w := httptest.NewRecorder()
+
+	// Call router
+	router.ServeHTTP(w, req)
+
+	// Assertions
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "application/json", w.Header().Get("Content-Type"))
+
+	var response struct {
+		Status string `json:"status"`
+	}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "ok", response.Status)
+
+	mockService.AssertExpectations(t)
+}
+
 func TestRouter_ShortenEndpoint(t *testing.T) {
 	mockService := &MockShortenerService{}
 	baseURL := "https://short.url"

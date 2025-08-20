@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -36,6 +37,27 @@ func NewPostgresStore(ctx context.Context, connString string) (*PostgresStore, e
 	store := &PostgresStore{pool: pool}
 
 	return store, nil
+}
+
+func ResetPostgresStore(connString string) error {
+	cfg, err := pgx.ParseConfig(connString)
+	if err != nil {
+		return fmt.Errorf("failed to parse connection string: %w", err)
+	}
+	db := stdlib.OpenDB(*cfg)
+	defer db.Close()
+
+	if err := goose.SetDialect("postgres"); err != nil {
+		return err
+	}
+	goose.SetBaseFS(migrationsFS)
+	if err := goose.Down(db, "migrations"); err != nil {
+		if strings.Contains(err.Error(), "no current version found") { // first migration run.
+			return nil
+		}
+		return err
+	}
+	return nil
 }
 
 // runMigrations applies database migrations using Goose

@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS url_mappings (
     expires_at TIMESTAMPTZ,
     clicks INTEGER NOT NULL DEFAULT 0
 );
-
 CREATE INDEX IF NOT EXISTS idx_url_mappings_user_id ON url_mappings(user_id);
 CREATE INDEX IF NOT EXISTS idx_url_mappings_expires_at ON url_mappings(expires_at);
 
