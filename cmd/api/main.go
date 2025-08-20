@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/wiredmatt/go-backend-template/internal/config"
+	"github.com/wiredmatt/go-short/internal/config"
 )
 
 func main() {

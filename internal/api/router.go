@@ -6,7 +6,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 	humago "github.com/danielgtaylor/huma/v2/adapters/humago"
-	"github.com/wiredmatt/go-backend-template/internal/shortener"
+	"github.com/wiredmatt/go-short/internal/shortener"
 )
 
 type HealthOutput struct {

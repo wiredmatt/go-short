@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/wiredmatt/go-backend-template/internal/config"
-	"github.com/wiredmatt/go-backend-template/internal/model"
+	"github.com/wiredmatt/go-short/internal/config"
+	"github.com/wiredmatt/go-short/internal/model"
 )
 
 func TestPostgresStore(t *testing.T) {

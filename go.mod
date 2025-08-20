@@ -1,4 +1,4 @@
-module github.com/wiredmatt/go-backend-template
+module github.com/wiredmatt/go-short
 
 go 1.24.4
 

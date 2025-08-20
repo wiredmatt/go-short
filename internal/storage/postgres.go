@@ -12,7 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
-	"github.com/wiredmatt/go-backend-template/internal/model"
+	"github.com/wiredmatt/go-short/internal/model"
 )
 
 //go:embed migrations/*.sql

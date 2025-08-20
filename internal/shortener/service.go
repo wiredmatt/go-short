@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/wiredmatt/go-backend-template/internal/model"
-	"github.com/wiredmatt/go-backend-template/internal/storage"
+	"github.com/wiredmatt/go-short/internal/model"
+	"github.com/wiredmatt/go-short/internal/storage"
 )
 
 // Shortener defines the interface for URL shortening operations

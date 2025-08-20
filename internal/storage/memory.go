@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/wiredmatt/go-backend-template/internal/model"
+	"github.com/wiredmatt/go-short/internal/model"
 )
 
 type MemoryStore struct {

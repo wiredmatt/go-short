@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/wiredmatt/go-backend-template/internal/config"
+	"github.com/wiredmatt/go-short/internal/config"
 )
 
 func NewStore(ctx context.Context, cfg config.DatabaseConfig) (Store, error) {
