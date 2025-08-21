@@ -52,7 +52,7 @@ func Load() (*Config, error) {
 		},
 		Database: DatabaseConfig{
 			Type:             getEnv("DB_TYPE", "postgres"),
-			ConnectionString: getEnv("DB_CONNECTION_STRING", "postgres://user:password@localhost:5432/shortener"),
+			ConnectionString: buildDbConnectionString(),
 		},
 		App: AppConfig{
 			BaseURL:         getEnv("BASE_URL", fmt.Sprintf("http://%s:%s", getEnv("HOST", "0.0.0.0"), getEnv("PORT", "3000"))),
@@ -85,7 +85,7 @@ func LoadForTest() (*Config, error) {
 		},
 		Database: DatabaseConfig{
 			Type:             getEnv("DB_TYPE", "memory"),
-			ConnectionString: getEnv("DB_CONNECTION_STRING", "postgres://user:password@localhost:5432/shortener"),
+			ConnectionString: buildDbConnectionString(),
 		},
 		App: AppConfig{
 			BaseURL:         getEnv("BASE_URL", "http://localhost:3000"),
@@ -100,6 +100,24 @@ func LoadForTest() (*Config, error) {
 	}
 
 	return config, nil
+}
+
+func buildDbConnectionString() string {
+	// If a full connection string is provided, use it
+	if conn := os.Getenv("DB_CONNECTION_STRING"); conn != "" {
+		return conn
+	}
+
+	// Otherwise, build from discrete vars (k8s)
+	host := getEnv("DB_HOST", "localhost")
+	port := getEnv("DB_PORT", "5432")
+	user := getEnv("DB_USER", "user")
+	pass := getEnv("DB_PASSWORD", "password")
+	dbname := getEnv("DB_NAME", "shortener")
+	engine := getEnv("DB_TYPE", "postgres")
+
+	return fmt.Sprintf("%s://%s:%s@%s:%s/%s?sslmode=disable",
+		engine, user, pass, host, port, dbname)
 }
 
 func (c *Config) Validate() error {

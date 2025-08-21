@@ -42,7 +42,7 @@ HOST=0.0.0.0
 ENVIRONMENT=development
 LOG_LEVEL=info
 SHORT_CODE_LENGTH=6
-DB_CONNECTION_STRING=postgres://user:password@localhost:5432/shortener
+DB_CONNECTION_STRING=postgres://user:password@localhost:5432/shortener?sslmode=disable
 DB_TYPE=memory # memory | postgres
 
 # Server timeouts
@@ -53,19 +53,19 @@ IDLE_TIMEOUT=60s
 
 ### Environment Variables
 
-| Variable            | Required | Default       | Description                               |
-| ------------------- | -------- | ------------- | ----------------------------------------- |
-| `BASE_URL`          | Yes      | -             | Base URL for shortened links              |
-| `PORT`              | No       | `3000`        | Server port                               |
-| `HOST`              | No       | `0.0.0.0`     | Server host                               |
-| `ENVIRONMENT`       | No       | `development` | Environment (development/production/test) |
-| `LOG_LEVEL`         | No       | `info`        | Logging level                             |
-| `SHORT_CODE_LENGTH` | No       | `6`           | Length of generated short codes (3-20)    |
-| `DB_TYPE`           | No       | `memory`      | Database type (memory/postgres/redis)     |
-| `DB_TYPE`           | No       | `postgres://user:password@localhost:5432/shortener`       | Database Connection String                |
-| `READ_TIMEOUT`      | No       | `30s`         | HTTP read timeout                         |
-| `WRITE_TIMEOUT`     | No       | `30s`         | HTTP write timeout                        |
-| `IDLE_TIMEOUT`      | No       | `60s`         | HTTP idle timeout                         |
+| Variable            | Required | Default                                                             | Description                               |
+| ------------------- | -------- | ------------------------------------------------------------------- | ----------------------------------------- |
+| `BASE_URL`          | Yes      | -                                                                   | Base URL for shortened links              |
+| `PORT`              | No       | `3000`                                                              | Server port                               |
+| `HOST`              | No       | `0.0.0.0`                                                           | Server host                               |
+| `ENVIRONMENT`       | No       | `development`                                                       | Environment (development/production/test) |
+| `LOG_LEVEL`         | No       | `info`                                                              | Logging level                             |
+| `SHORT_CODE_LENGTH` | No       | `6`                                                                 | Length of generated short codes (3-20)    |
+| `DB_TYPE`           | No       | `memory`                                                            | Database type (memory/postgres/redis)     |
+| `DB_TYPE`           | No       | `postgres://user:password@localhost:5432/shortener?sslmode=disable` | Database Connection String                |
+| `READ_TIMEOUT`      | No       | `30s`                                                               | HTTP read timeout                         |
+| `WRITE_TIMEOUT`     | No       | `30s`                                                               | HTTP write timeout                        |
+| `IDLE_TIMEOUT`      | No       | `60s`                                                               | HTTP idle timeout                         |
 
 ## Commands
 
@@ -73,8 +73,7 @@ IDLE_TIMEOUT=60s
 
 ```sh
 docker-compose up -d # (optional) if you want to run with postgres, otherwise set DB_TYPE=memory
-                     # note that if you run tests without a postgres instance running, some of
-                     # them may fail.
+# note that if you run tests without a postgres instance running, some of them may fail.
 ```
 
 ```sh
