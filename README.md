@@ -49,22 +49,6 @@ WRITE_TIMEOUT=30s
 IDLE_TIMEOUT=60s
 ```
 
-### Environment Variables
-
-| Variable            | Required | Default                                                             | Description                               |
-| ------------------- | -------- | ------------------------------------------------------------------- | ----------------------------------------- |
-| `BASE_URL`          | Yes      | -                                                                   | Base URL for shortened links              |
-| `PORT`              | No       | `3000`                                                              | Server port                               |
-| `HOST`              | No       | `0.0.0.0`                                                           | Server host                               |
-| `ENVIRONMENT`       | No       | `development`                                                       | Environment (development/production/test) |
-| `LOG_LEVEL`         | No       | `info`                                                              | Logging level                             |
-| `SHORT_CODE_LENGTH` | No       | `6`                                                                 | Length of generated short codes (3-20)    |
-| `DB_TYPE`           | No       | `memory`                                                            | Database type (memory/postgres/redis)     |
-| `DB_TYPE`           | No       | `postgres://user:password@localhost:5432/shortener?sslmode=disable` | Database Connection String                |
-| `READ_TIMEOUT`      | No       | `30s`                                                               | HTTP read timeout                         |
-| `WRITE_TIMEOUT`     | No       | `30s`                                                               | HTTP write timeout                        |
-| `IDLE_TIMEOUT`      | No       | `60s`                                                               | HTTP idle timeout                         |
-
 ## Commands
 
 ### Development
@@ -103,7 +87,7 @@ make test-benchmark    # Run benchmark tests
 make clean
 ```
 
-### K8s
+## K8s
 
 See [./k8s/README.md](./k8s/README.md)
 
@@ -119,14 +103,6 @@ The codebase includes comprehensive tests covering:
 - **Integration Tests**: End-to-end testing with real components
 - **Benchmark Tests**: Performance testing for critical operations
 - **Concurrency Tests**: Thread safety verification
-
-### Test Coverage
-
-- **API Layer**: 100% coverage
-- **Service Layer**: 100% coverage
-- **Storage Layer**: 100% coverage
-- **Model Layer**: 100% coverage
-- **Config Layer**: 100% coverage
 
 ### Running Tests
 
@@ -161,13 +137,3 @@ internal/
 ├── model/        # Data models
 └── config/       # Configuration management
 ```
-
-## Configuration Management
-
-The configuration system provides:
-
-- **Environment-based configuration** with sensible defaults
-- **Validation** of required settings
-- **Type-safe access** to configuration values
-- **Test isolation** using separate `.env.test` files
-- **Graceful error handling** for missing or invalid values
