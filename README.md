@@ -19,9 +19,7 @@ AI was used in this project to create tests, add comments and generate documenta
 
 ## TODO
 
-- dockerize app.
-- kubernetes deployment
-- [opentelemetry](https://opentelemetry.io/docs/languages/go/getting-started/) or [prometheus](https://prometheus.io/docs/guides/go-application/) and [graphana](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-golang/)
+- integrate [opentelemetry](https://opentelemetry.io/docs/languages/go/getting-started/) or [prometheus](https://prometheus.io/docs/guides/go-application/) and [graphana](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-golang/)
 
 ## Dependencies
 
