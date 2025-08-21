@@ -72,25 +72,20 @@ IDLE_TIMEOUT=60s
 ```sh
 docker-compose up -d # (optional) if you want to run with postgres, otherwise set DB_TYPE=memory
 # note that if you run tests without a postgres instance running, some of them may fail.
-```
 
-```sh
-make dev-api    # requires air to be installed
-make dev-cli    # requires air to be installed
+make dev-api    # requires air to be installed, use `make run-api` otherwise
 ```
 
 ### Building
 
 ```sh
 make build-api
-make build-cli
 ```
 
 ### Running
 
 ```sh
 make run-api
-make run-cli
 ```
 
 ### Testing
@@ -108,14 +103,13 @@ make test-benchmark    # Run benchmark tests
 make clean
 ```
 
+### K8s
+
+See [./k8s/README.md](./k8s/README.md)
+
 ## API Docs
 
 API docs are avaiable at http://localhost:3000/docs
-
-## API Endpoints
-
-- `POST /shorten` - Create a shortened URL
-- `GET /{code}` - Resolve and redirect to original URL
 
 ## Testing
 

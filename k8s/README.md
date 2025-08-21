@@ -16,3 +16,7 @@ kubectl logs deployment/myapi -n myapp
 
 kubectl port-forward svc/myapi 3000:80 -n myapp
 ```
+
+## prod
+
+todo
