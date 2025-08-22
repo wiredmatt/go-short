@@ -8,4 +8,5 @@ type Store interface {
 	IncrementClickCount(code string) error
 	ListByUser(userID string) ([]model.URLMapping, error)
 	Delete(code string) error
+	Close()
 }

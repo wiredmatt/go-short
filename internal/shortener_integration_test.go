@@ -20,16 +20,22 @@ func TestShortenerIntegration(t *testing.T) {
 		t.Skip("skipping integration test")
 	}
 
-	cfg, err := config.LoadForTest()
+	cfg, err := config.Load()
 	assert.NoError(t, err)
 
 	ctx := context.Background()
 
-	store, err := storage.NewPostgresStore(ctx, cfg.Database.ConnectionString)
+	store, err := storage.NewStore(ctx, cfg.Database)
 	assert.NoError(t, err)
 
 	service := shortener.NewService(store, cfg.App.BaseURL, cfg.App.ShortCodeLength)
 	router := api.NewRouter(service)
+
+	cleanup := func() {
+		store.Close()
+	}
+
+	defer cleanup()
 
 	t.Run("Shorten And Resolve", func(t *testing.T) {
 		// Test shortening a URL

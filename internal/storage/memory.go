@@ -68,3 +68,5 @@ func (m *MemoryStore) Delete(code string) error {
 	delete(m.data, code)
 	return nil
 }
+
+func (m *MemoryStore) Close() {}

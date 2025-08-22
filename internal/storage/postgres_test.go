@@ -15,13 +15,19 @@ func TestPostgresStoreIntegration(t *testing.T) {
 		t.Skip("skipping integration test")
 	}
 
-	cfg, err := config.LoadForTest()
+	cfg, err := config.Load()
 	assert.NoError(t, err)
 
 	ctx := context.Background()
 
 	store, err := NewPostgresStore(ctx, cfg.Database.ConnectionString)
 	assert.NoError(t, err)
+
+	cleanup := func() {
+		store.Close()
+	}
+
+	defer cleanup()
 
 	t.Run("Save and Get", func(t *testing.T) {
 		mapping := model.URLMapping{

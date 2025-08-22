@@ -42,6 +42,8 @@ func (m *MockStore) Delete(code string) error {
 	return args.Error(0)
 }
 
+func (m *MockStore) Close() {}
+
 func TestNewService(t *testing.T) {
 	mockStore := &MockStore{}
 	baseURL := "https://short.url"

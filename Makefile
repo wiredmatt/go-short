@@ -37,12 +37,19 @@ build_api:
 	@mkdir -p $(BIN_DIR)
 	go build -o $(API_BIN) $(API_MAIN)
 
-## Test targets
 .PHONY: test_e2e
 test_e2e:
 	@echo "Running e2e tests..."
 	go clean -testcache
-	go test -v -p 1 -run Integration ./...
+	@if ! go test -v -p 1 -run Integration ./...; then \
+		echo "-------------------------------------------------------------"; \
+		echo "ERROR: e2e tests failed. Are you running a Postgres instance?"; \
+		echo "-------------------------------------------------------------"; \
+		echo "INFO: you can run a local postgres instance through docker by using the following command:" ;\
+		echo "docker run --name my_postgres_db -e POSTGRES_PASSWORD=password -e POSTGRES_USER=user -e POSTGRES_DB=shortener -p 5432:5432 -v -d postgres:16-alpine" ; \
+		echo "-------------------------------------------------------------"; \
+		exit 1; \
+	fi
 	@echo "e2e tests completed."
 
 .PHONY: test_unit

@@ -42,6 +42,8 @@ func (m *BenchmarkStore) Delete(code string) error {
 	return args.Error(0)
 }
 
+func (m *BenchmarkStore) Close() {}
+
 func BenchmarkShorten(b *testing.B) {
 	mockStore := &BenchmarkStore{}
 	baseURL := "https://short.url"
