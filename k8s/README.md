@@ -5,7 +5,7 @@
 ```sh
 kind create cluster # or use minikube or whatever you prefer
 
-docker build -t myapi:latest . # make sure this is run in the root directory of the project.
+docker buildx build -t myapi:latest -f .docker/Dockerfile . # make sure this is run in the root directory of the project.
 kind load docker-image myapi:latest # or use minikube or whatever you prefer
 
 kubectl apply -k k8s/overlays/dev

@@ -23,11 +23,29 @@ var (
 		},
 		[]string{"path", "status"},
 	)
+
+	metricsInitialized = false
 )
 
 func PrometheusInit() {
-	prometheus.MustRegister(RequestCount)
-	prometheus.MustRegister(ErrorCount)
+	if metricsInitialized {
+		return
+	}
+
+	// Try to register the collectors, but don't panic if they're already registered
+	if err := prometheus.Register(RequestCount); err != nil {
+		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+			panic(err)
+		}
+	}
+
+	if err := prometheus.Register(ErrorCount); err != nil {
+		if _, ok := err.(prometheus.AlreadyRegisteredError); !ok {
+			panic(err)
+		}
+	}
+
+	metricsInitialized = true
 }
 
 func TrackMetrics(ctx huma.Context, next func(huma.Context)) {

@@ -24,18 +24,9 @@ func TestShortenerIntegration(t *testing.T) {
 	assert.NoError(t, err)
 
 	ctx := context.Background()
-	err = storage.ResetPostgresStore(cfg.Database.ConnectionString)
-	if err != nil {
-		panic(err)
-	}
 
 	store, err := storage.NewPostgresStore(ctx, cfg.Database.ConnectionString)
-	if err != nil {
-		panic(err)
-	}
-
-	defer store.Close()
-	defer storage.ResetPostgresStore(cfg.Database.ConnectionString)
+	assert.NoError(t, err)
 
 	service := shortener.NewService(store, cfg.App.BaseURL, cfg.App.ShortCodeLength)
 	router := api.NewRouter(service)

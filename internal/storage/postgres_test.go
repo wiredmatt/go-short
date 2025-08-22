@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -13,33 +12,16 @@ import (
 
 func TestPostgresStoreIntegration(t *testing.T) {
 	if testing.Short() {
-		fmt.Println("skipping postgres integration test")
+		t.Skip("skipping integration test")
 	}
 
 	cfg, err := config.LoadForTest()
 	assert.NoError(t, err)
 
 	ctx := context.Background()
-	err = ResetPostgresStore(cfg.Database.ConnectionString)
-	if err != nil {
-		panic(err)
-	}
-	assert.NoError(t, err)
 
 	store, err := NewPostgresStore(ctx, cfg.Database.ConnectionString)
-	if err != nil {
-		panic(err)
-	}
 	assert.NoError(t, err)
-
-	cleanup := func() {
-		store.Close()
-		err := ResetPostgresStore(cfg.Database.ConnectionString)
-
-		assert.NoError(t, err)
-	}
-
-	defer cleanup()
 
 	t.Run("Save and Get", func(t *testing.T) {
 		mapping := model.URLMapping{

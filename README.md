@@ -22,28 +22,8 @@ AI was used in this project to create tests, add comments and generate documenta
 - golang >= 1.24.4
 - air >= v1.62.0 (install with `go install github.com/air-verse/air@latest`)
 - make
-
-## Configuration
-
-The application uses environment variables for configuration. Create a `.env` file in the root directory:
-
-```env
-# Optional (with defaults)
-
-BASE_URL=https://your-domain.com
-PORT=4000
-HOST=0.0.0.0
-ENVIRONMENT=development
-LOG_LEVEL=info
-SHORT_CODE_LENGTH=6
-DB_CONNECTION_STRING=postgres://user:password@db:5432/shortener?sslmode=disable
-DB_TYPE=memory # memory | postgres
-
-# Server timeouts
-READ_TIMEOUT=30s
-WRITE_TIMEOUT=30s
-IDLE_TIMEOUT=60s
-```
+- docker & docker compose (optional)
+- kubernetes (optional)
 
 ## Commands
 
@@ -66,8 +46,9 @@ make build_api
 ### Testing
 
 ```sh
+make test_unit         # Run unit tests only
+make test_e2e          # Run Integration tests only
 make test              # Run all tests
-make test_short        # Run short tests only
 make test_coverage     # Run tests with coverage report
 make test_benchmark    # Run benchmark tests
 ```
@@ -76,13 +57,6 @@ make test_benchmark    # Run benchmark tests
 
 ```sh
 make clean
-```
-
-### Prod
-
-```sh
-make run_compose_prod_api # requires docker and docker compose to be installed
-# or, see k8s setup in ./k8s/README.md
 ```
 
 ## API Docs

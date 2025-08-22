@@ -20,7 +20,7 @@ run_dev_api:
 # Run API with hot reload + postgres, prometheus and grafana (dev)
 .PHONY: run_compose_dev_api
 run_compose_dev_api:
-	docker compose -f ./.docker/docker-compose.dev.yaml up --build
+	docker compose -f ./.docker/docker-compose.dev.yaml up
 
 # Run API with postgres, prometheus and grafana (prod)
 .PHONY: run_compose_prod_api
@@ -38,21 +38,22 @@ build_api:
 	go build -o $(API_BIN) $(API_MAIN)
 
 ## Test targets
-.PHONY: test-e2e
+.PHONY: test_e2e
 test_e2e:
 	@echo "Running e2e tests..."
-	go test -run Integration ./...
-	@echo "All tests completed."
+	go clean -testcache
+	go test -v -run Integration ./...
+	@echo "e2e tests completed."
 
 .PHONY: test_unit
 test_unit:
 	@echo "Running unit tests..."
 	go test -v -short ./...
-	@echo "All tests completed."
+	@echo "unit tests completed."
 
 ## Combined test target
 .PHONY: test
-test: test-unit test-e2e
+test: test_unit test_e2e
 	@echo "All tests completed."
 
 .PHONY: test_coverage
