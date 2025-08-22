@@ -18,7 +18,7 @@ jobs:
           POSTGRES_PASSWORD: password
           POSTGRES_DB: shortener
         options: >-
-          --health-cmd="pg_isready -U testuser -d testdb"
+          --health-cmd="pg_isready -U testuser -d shortener"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5

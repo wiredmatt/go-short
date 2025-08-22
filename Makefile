@@ -42,7 +42,7 @@ build_api:
 test_e2e:
 	@echo "Running e2e tests..."
 	go clean -testcache
-	go test -v -run Integration ./...
+	go test -v -p 1 -run Integration ./...
 	@echo "e2e tests completed."
 
 .PHONY: test_unit
