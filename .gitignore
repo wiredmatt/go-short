@@ -4,3 +4,4 @@ bin
 .env
 coverage.html
 coverage.out
+loki-data

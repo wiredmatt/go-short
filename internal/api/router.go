@@ -6,7 +6,9 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 	humago "github.com/danielgtaylor/huma/v2/adapters/humago"
-	"github.com/wiredmatt/go-short/internal/shortener"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/wiredmatt/go_short/internal/api/middleware"
+	"github.com/wiredmatt/go_short/internal/shortener"
 )
 
 type HealthOutput struct {
@@ -38,10 +40,16 @@ type ResolveOutput struct {
 }
 
 func NewRouter(service shortener.Shortener) *http.ServeMux {
-	r := http.NewServeMux()
+	apiMux := http.NewServeMux()
 
 	// Initialize Huma on this mux
-	humaAPI := humago.New(r, huma.DefaultConfig("URL Shortener API", "1.0.0"))
+	humaAPI := humago.New(apiMux, huma.DefaultConfig("URL Shortener API", "1.0.0"))
+
+	middleware.PrometheusInit()
+
+	humaAPI.UseMiddleware(middleware.RequestID)
+	humaAPI.UseMiddleware(middleware.RequestLogger)
+	humaAPI.UseMiddleware(middleware.TrackMetrics)
 
 	huma.Register(humaAPI, huma.Operation{
 		Method:  http.MethodGet,
@@ -84,5 +92,12 @@ func NewRouter(service shortener.Shortener) *http.ServeMux {
 		}, nil
 	})
 
-	return r
+	metricsMux := http.NewServeMux()
+	metricsMux.Handle("/metrics", promhttp.Handler())
+
+	root := http.NewServeMux()
+	root.Handle("/metrics", promhttp.Handler())
+	root.Handle("/", apiMux)
+
+	return root
 }

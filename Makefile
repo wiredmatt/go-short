@@ -1,59 +1,51 @@
 # Project variables
 BIN_DIR := bin
 API_BIN := $(BIN_DIR)/api
-CLI_BIN := $(BIN_DIR)/cli
 
 API_MAIN := ./cmd/api/main.go
-CLI_MAIN := ./cmd/cli/main.go
 
 # Default target
 .PHONY: all
 all: build
 
-## API Development target
-.PHONY: dev-api
-dev-api:
+.PHONY: run_api
+run_api:
+	go run cmd/api/main.go
+
+# Run API with just hot reload (dev)
+.PHONY: run_dev_api
+run_dev_api:
 	air -c .air.api.toml
 
-## CLI Development target
-.PHONY: dev-cli
-dev-cli:
-	air -c .air.cli.toml
+# Run API with hot reload + postgres, prometheus and grafana (dev)
+.PHONY: run_compose_dev_api
+run_compose_dev_api:
+	docker compose -f ./.docker/docker-compose.dev.yaml up --build
 
+# Run API with postgres, prometheus and grafana (prod)
+.PHONY: run_compose_prod_api
+run_compose_prod_api:
+	docker compose -f .docker/docker-compose.yaml up -d --build
+	
 ## Build targets
 .PHONY: build
-build: build-api build-cli
+build: build_api
 
-.PHONY: build-api
-build-api:
+.PHONY: build_api
+build_api:
 	@echo "Building API..."
 	@mkdir -p $(BIN_DIR)
 	go build -o $(API_BIN) $(API_MAIN)
 
-.PHONY: build-cli
-build-cli:
-	@echo "Building CLI..."
-	@mkdir -p $(BIN_DIR)
-	go build -o $(CLI_BIN) $(CLI_MAIN)
-
-## Run targets
-.PHONY: run-api
-run-api:
-	go run $(API_MAIN)
-
-.PHONY: run-cli
-run-cli:
-	go run $(CLI_MAIN)
-
 ## Test targets
 .PHONY: test-e2e
-test-e2e:
+test_e2e:
 	@echo "Running e2e tests..."
 	go test -run Integration ./...
 	@echo "All tests completed."
 
-.PHONY: test-unit
-test-unit:
+.PHONY: test_unit
+test_unit:
 	@echo "Running unit tests..."
 	go test -v -short ./...
 	@echo "All tests completed."
@@ -63,15 +55,15 @@ test-unit:
 test: test-unit test-e2e
 	@echo "All tests completed."
 
-.PHONY: test-coverage
-test-coverage:
+.PHONY: test_coverage
+test_coverage:
 	@echo "Running tests with coverage..."
 	go test -v -short -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
-.PHONY: test-benchmark
-test-benchmark:
+.PHONY: test_benchmark
+test_benchmark:
 	@echo "Running benchmarks..."
 	go test -v -short -bench=. -benchmem ./...
 

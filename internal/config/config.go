@@ -44,7 +44,7 @@ func Load() (*Config, error) {
 
 	config := &Config{
 		Server: ServerConfig{
-			Port:         getEnv("PORT", "3000"),
+			Port:         getEnv("PORT", "4000"),
 			Host:         getEnv("HOST", "0.0.0.0"),
 			ReadTimeout:  getDurationEnv("READ_TIMEOUT", 30*time.Second),
 			WriteTimeout: getDurationEnv("WRITE_TIMEOUT", 30*time.Second),
@@ -55,7 +55,7 @@ func Load() (*Config, error) {
 			ConnectionString: buildDbConnectionString(),
 		},
 		App: AppConfig{
-			BaseURL:         getEnv("BASE_URL", fmt.Sprintf("http://%s:%s", getEnv("HOST", "0.0.0.0"), getEnv("PORT", "3000"))),
+			BaseURL:         getEnv("BASE_URL", fmt.Sprintf("http://%s:%s", getEnv("HOST", "0.0.0.0"), getEnv("PORT", "4000"))),
 			Environment:     getEnv("ENVIRONMENT", "development"),
 			LogLevel:        getEnv("LOG_LEVEL", "info"),
 			ShortCodeLength: getIntEnv("SHORT_CODE_LENGTH", 6),
@@ -77,7 +77,7 @@ func LoadForTest() (*Config, error) {
 
 	config := &Config{
 		Server: ServerConfig{
-			Port:         getEnv("PORT", "3000"),
+			Port:         getEnv("PORT", "4000"),
 			Host:         getEnv("HOST", "0.0.0.0"),
 			ReadTimeout:  getDurationEnv("READ_TIMEOUT", 30*time.Second),
 			WriteTimeout: getDurationEnv("WRITE_TIMEOUT", 30*time.Second),
@@ -88,7 +88,7 @@ func LoadForTest() (*Config, error) {
 			ConnectionString: buildDbConnectionString(),
 		},
 		App: AppConfig{
-			BaseURL:         getEnv("BASE_URL", "http://localhost:3000"),
+			BaseURL:         getEnv("BASE_URL", "http://localhost:4000"),
 			Environment:     getEnv("ENVIRONMENT", "development"),
 			LogLevel:        getEnv("LOG_LEVEL", "info"),
 			ShortCodeLength: getIntEnv("SHORT_CODE_LENGTH", 6),

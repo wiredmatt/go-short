@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/wiredmatt/go-short/internal/model"
+	"github.com/wiredmatt/go_short/internal/model"
 )
 
 // MockStore is a mock implementation of the storage.Store interface

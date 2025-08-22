@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/wiredmatt/go-short/internal/model"
+import "github.com/wiredmatt/go_short/internal/model"
 
 type Store interface {
 	Save(mapping model.URLMapping) error

@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/wiredmatt/go-short/internal/api"
-	"github.com/wiredmatt/go-short/internal/config"
-	"github.com/wiredmatt/go-short/internal/shortener"
-	"github.com/wiredmatt/go-short/internal/storage"
+	"github.com/wiredmatt/go_short/internal/api"
+	"github.com/wiredmatt/go_short/internal/config"
+	"github.com/wiredmatt/go_short/internal/shortener"
+	"github.com/wiredmatt/go_short/internal/storage"
 )
 
 func TestShortenerIntegration(t *testing.T) {

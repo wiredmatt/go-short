@@ -4,10 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/wiredmatt/go-short/internal/api"
-	"github.com/wiredmatt/go-short/internal/config"
-	"github.com/wiredmatt/go-short/internal/shortener"
-	"github.com/wiredmatt/go-short/internal/storage"
+	"github.com/wiredmatt/go_short/internal/api"
+	"github.com/wiredmatt/go_short/internal/config"
+	"github.com/wiredmatt/go_short/internal/shortener"
+	"github.com/wiredmatt/go_short/internal/storage"
 )
 
 type App struct {

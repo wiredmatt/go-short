@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/wiredmatt/go-short/cmd/api/app"
-	"github.com/wiredmatt/go-short/internal/config"
+	"github.com/wiredmatt/go_short/cmd/api/app"
+	"github.com/wiredmatt/go_short/internal/config"
 )
 
 func main() {

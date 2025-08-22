@@ -1,4 +1,4 @@
-# go-short
+# go_short
 
 A URL shortener service built with Go, featuring a clean architecture with comprehensive test coverage.
 
@@ -17,10 +17,6 @@ AI was used in this project to create tests, add comments and generate documenta
 - Benchmark tests for performance monitoring
 - Centralized configuration management
 
-## TODO
-
-- integrate [opentelemetry](https://opentelemetry.io/docs/languages/go/getting-started/) or [prometheus](https://prometheus.io/docs/guides/go-application/) and [graphana](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-golang/)
-
 ## Dependencies
 
 - golang >= 1.24.4
@@ -35,12 +31,12 @@ The application uses environment variables for configuration. Create a `.env` fi
 # Optional (with defaults)
 
 BASE_URL=https://your-domain.com
-PORT=3000
+PORT=4000
 HOST=0.0.0.0
 ENVIRONMENT=development
 LOG_LEVEL=info
 SHORT_CODE_LENGTH=6
-DB_CONNECTION_STRING=postgres://user:password@localhost:5432/shortener?sslmode=disable
+DB_CONNECTION_STRING=postgres://user:password@db:5432/shortener?sslmode=disable
 DB_TYPE=memory # memory | postgres
 
 # Server timeouts
@@ -54,31 +50,26 @@ IDLE_TIMEOUT=60s
 ### Development
 
 ```sh
-docker-compose up -d # (optional) if you want to run with postgres, otherwise set DB_TYPE=memory
-# note that if you run tests without a postgres instance running, some of them may fail.
-
-make dev-api    # requires air to be installed, use `make run-api` otherwise
+make run_compose_dev_api # requires docker and docker compose to be installed
+# or
+make run_dev_api # runs cmd/api/main.go with air for hot reload
+# or
+make run_api # runs cmd/api.main.go with go run, will fail if you don't have postgres running
 ```
 
 ### Building
 
 ```sh
-make build-api
-```
-
-### Running
-
-```sh
-make run-api
+make build_api
 ```
 
 ### Testing
 
 ```sh
 make test              # Run all tests
-make test-short        # Run short tests only
-make test-coverage     # Run tests with coverage report
-make test-benchmark    # Run benchmark tests
+make test_short        # Run short tests only
+make test_coverage     # Run tests with coverage report
+make test_benchmark    # Run benchmark tests
 ```
 
 ### Cleanup
@@ -87,39 +78,52 @@ make test-benchmark    # Run benchmark tests
 make clean
 ```
 
+### Prod
+
+```sh
+make run_compose_prod_api # requires docker and docker compose to be installed
+# or, see k8s setup in ./k8s/README.md
+```
+
+## API Docs
+
+API docs are avaiable at http://localhost:4000/docs
+
 ## K8s
 
 See [./k8s/README.md](./k8s/README.md)
 
-## API Docs
+## Prometheus
 
-API docs are avaiable at http://localhost:3000/docs
+If running with docker compose, you should find the prometheus GUI at http://localhost:9090, you may execute any query for the counters `go_short_requests_total` or `go_short_requests_errors_total` (both defined in [middleware/prometheus.go](./internal/api/middleware/prometheus.go)).
 
-## Testing
+### Examples
 
-The codebase includes comprehensive tests covering:
+#### sum(go_short_requests_total)
 
-- **Unit Tests**: Individual component testing with mocks
-- **Integration Tests**: End-to-end testing with real components
-- **Benchmark Tests**: Performance testing for critical operations
-- **Concurrency Tests**: Thread safety verification
+![prometheus example 1](./docs/prometheus_ex1.png)
 
-### Running Tests
+#### sum by (path)(myapp_requests_total)
 
-```sh
-# Run all tests
-make test
+![prometheus example 2](./docs/prometheus_ex2.png)
 
-# Run tests with coverage
-make test-coverage
+#### sum by (path,status)(go_short_requests_errors_total)
 
-# Run benchmarks
-make test-benchmark
-```
+![prometheus example 3](./docs/prometheus_ex3.png)
 
-### Test Configuration
+## Promtail + Loki
 
-Tests use a separate `.env.test` file to avoid interfering with your development configuration. The test configuration is automatically loaded during test execution.
+If running with docker compose, both Promtail and Loki should be running and fetching logs from all docker containers running, you may change this by editing the file [.docker/promtail.yaml](.docker/promtail.yaml#18) and changing the `regex` property under `relabel_configs`, under `scrape_configs`, to `.*go_short.*` in order to get only those matching the Go app.
+
+### Example getting all logs from go_short
+
+![Loki all logs from go_short](./docs/loki_ex1.png)
+
+## Grafana
+
+If running with docker compose, you should find the grafana GUI at http://localhost:3000 (default credentials are `admin:admin`).
+
+![grafana dashboard example 1](./docs/grafana_dashboard1.png)
 
 ## Architecture
 

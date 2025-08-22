@@ -2,15 +2,20 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/wiredmatt/go-short/internal/config"
-	"github.com/wiredmatt/go-short/internal/model"
+	"github.com/wiredmatt/go_short/internal/config"
+	"github.com/wiredmatt/go_short/internal/model"
 )
 
-func TestPostgresStore(t *testing.T) {
+func TestPostgresStoreIntegration(t *testing.T) {
+	if testing.Short() {
+		fmt.Println("skipping postgres integration test")
+	}
+
 	cfg, err := config.LoadForTest()
 	assert.NoError(t, err)
 

@@ -31,7 +31,7 @@ func TestLoad_DefaultValues(t *testing.T) {
 	assert.NotNil(t, cfg)
 
 	// Test default values
-	assert.Equal(t, "3000", cfg.Server.Port)
+	assert.Equal(t, "4000", cfg.Server.Port)
 	assert.Equal(t, "0.0.0.0", cfg.Server.Host)
 	assert.Equal(t, 30*time.Second, cfg.Server.ReadTimeout)
 	assert.Equal(t, 30*time.Second, cfg.Server.WriteTimeout)
@@ -55,7 +55,7 @@ func TestLoad_CustomValues(t *testing.T) {
 	os.Setenv("WRITE_TIMEOUT", "60s")
 	os.Setenv("IDLE_TIMEOUT", "120s")
 	os.Setenv("DB_TYPE", "postgres")
-	os.Setenv("DB_CONNECTION_STRING", "postgres://user:password@localhost:5432/shorten")
+	os.Setenv("DB_CONNECTION_STRING", "postgres://user:password@db:5432/shorten")
 
 	cfg, err := LoadForTest()
 
@@ -69,7 +69,7 @@ func TestLoad_CustomValues(t *testing.T) {
 	assert.Equal(t, 60*time.Second, cfg.Server.WriteTimeout)
 	assert.Equal(t, 120*time.Second, cfg.Server.IdleTimeout)
 	assert.Equal(t, "postgres", cfg.Database.Type)
-	assert.Equal(t, "postgres://user:password@localhost:5432/shorten", cfg.Database.ConnectionString)
+	assert.Equal(t, "postgres://user:password@db:5432/shorten", cfg.Database.ConnectionString)
 	assert.Equal(t, "https://custom.url", cfg.App.BaseURL)
 	assert.Equal(t, "production", cfg.App.Environment)
 	assert.Equal(t, "debug", cfg.App.LogLevel)
@@ -101,7 +101,7 @@ func TestLoad_InvalidDuration(t *testing.T) {
 func TestValidate_Success(t *testing.T) {
 	cfg := &Config{
 		Server: ServerConfig{
-			Port: "3000",
+			Port: "4000",
 		},
 		App: AppConfig{
 			BaseURL:         "https://short.url",
@@ -116,7 +116,7 @@ func TestValidate_Success(t *testing.T) {
 func TestValidate_MissingBaseURL(t *testing.T) {
 	cfg := &Config{
 		Server: ServerConfig{
-			Port: "3000",
+			Port: "4000",
 		},
 		App: AppConfig{
 			BaseURL:         "",
@@ -162,7 +162,7 @@ func TestValidate_InvalidShortCodeLength(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := &Config{
 				Server: ServerConfig{
-					Port: "3000",
+					Port: "4000",
 				},
 				App: AppConfig{
 					BaseURL:         "https://short.url",

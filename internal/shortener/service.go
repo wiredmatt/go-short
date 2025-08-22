@@ -2,11 +2,13 @@ package shortener
 
 import (
 	"errors"
+	"log/slog"
 	"math/rand"
+	"os"
 	"time"
 
-	"github.com/wiredmatt/go-short/internal/model"
-	"github.com/wiredmatt/go-short/internal/storage"
+	"github.com/wiredmatt/go_short/internal/model"
+	"github.com/wiredmatt/go_short/internal/storage"
 )
 
 // Shortener defines the interface for URL shortening operations
@@ -20,6 +22,7 @@ type ShortenerService struct {
 	store           storage.Store
 	baseURL         string
 	shortCodeLength int
+	logger          *slog.Logger
 }
 
 func NewService(store storage.Store, baseURL string, shortCodeLength int) *ShortenerService {
@@ -27,6 +30,9 @@ func NewService(store storage.Store, baseURL string, shortCodeLength int) *Short
 		store:           store,
 		baseURL:         baseURL,
 		shortCodeLength: shortCodeLength,
+		logger: slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+			Level: slog.LevelInfo,
+		})),
 	}
 }
 
@@ -35,6 +41,8 @@ func (s *ShortenerService) GetBaseURL() string {
 }
 
 func (s *ShortenerService) Shorten(userID, originalURL string) (string, error) {
+	s.logger.Info("Shortening new url: ", slog.String("originalURL", originalURL))
+
 	code := generateCode(s.shortCodeLength)
 	mapping := model.URLMapping{
 		Code:      code,
@@ -44,6 +52,10 @@ func (s *ShortenerService) Shorten(userID, originalURL string) (string, error) {
 	}
 	err := s.store.Save(mapping)
 	if err != nil {
+		s.logger.Error("Shorten failed",
+			slog.Any("input", mapping),
+			slog.String("error", err.Error()),
+		)
 		return "", err
 	}
 	return code, nil
@@ -51,7 +63,14 @@ func (s *ShortenerService) Shorten(userID, originalURL string) (string, error) {
 
 func (s *ShortenerService) Resolve(code string) (string, error) {
 	original_url, err := s.store.Get(code)
-	if err != nil || original_url == nil {
+	if err != nil {
+		s.logger.Error("Resolve failed",
+			slog.Group("input", slog.String("code", code)),
+			slog.String("error", err.Error()),
+		)
+	}
+
+	if original_url == nil {
 		return "", errors.New("code not found")
 	}
 	return *original_url, nil

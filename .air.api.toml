@@ -3,10 +3,10 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-cmd = "go build -o ./bin/api ./cmd/api"
+cmd = "go build -buildvcs=false -o ./bin/api ./cmd/api"
 bin = "bin/api"
 full_bin = "./bin/api"
-exclude_dir = ["bin", "tmp", "vendor", "cmd/cli"]
+exclude_dir = ["bin", "tmp", "vendor", "cmd/cli", "k8s", "prometheus", ".docker"]
 
 [log]
 time = true

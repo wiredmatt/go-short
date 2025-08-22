@@ -21,7 +21,7 @@ WORKDIR /app
 # Copy binary from builder
 COPY --from=builder /api /app/api
 
-EXPOSE 3000
+EXPOSE 4000
 
 # Run
 ENTRYPOINT ["/app/api"]

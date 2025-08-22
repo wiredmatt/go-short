@@ -11,10 +11,10 @@ kind load docker-image myapi:latest # or use minikube or whatever you prefer
 kubectl apply -k k8s/overlays/dev
 kubectl rollout restart deployment myapi -n myapp
 
-kubectl get pods -n myapp        
+kubectl get pods -n myapp
 kubectl logs deployment/myapi -n myapp
 
-kubectl port-forward svc/myapi 3000:80 -n myapp
+kubectl port-forward svc/myapi 4000:80 -n myapp
 ```
 
 ## prod

@@ -1,0 +1,6 @@
+.env
+.env.example
+.git
+.docker
+tmp
+bin

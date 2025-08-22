@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/wiredmatt/go-short/internal/config"
+	"github.com/wiredmatt/go_short/internal/config"
 )
 
 func TestNewApp_Success(t *testing.T) {

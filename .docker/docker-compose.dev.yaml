@@ -1,0 +1,96 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shortener
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - go_short_ntwrk
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+    ports:
+      - "9090:9090"
+    networks:
+      - go_short_ntwrk
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/loki.yaml
+    volumes:
+      - ./loki.yaml:/etc/loki/loki.yaml
+      - loki-data:/loki
+    networks:
+      - go_short_ntwrk
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100/ready"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    user: "0:0" # Run as root to ensure access
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./promtail.yaml:/etc/promtail/promtail.yaml
+    command: -config.file=/etc/promtail/promtail.yaml
+    networks:
+      - go_short_ntwrk
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    networks:
+      - go_short_ntwrk
+
+  go_short:
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile.dev
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+    depends_on:
+      promtail:
+        condition: service_started
+      prometheus:
+        condition: service_started
+      db:
+        condition: service_healthy
+    networks:
+      - go_short_ntwrk
+    environment:
+      - DB_HOST=db
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=shortener
+    volumes:
+      - ..:/app
+
+networks:
+  go_short_ntwrk:
+    driver: bridge
+volumes:
+  loki-data:

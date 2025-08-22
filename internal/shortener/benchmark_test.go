@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/mock"
-	"github.com/wiredmatt/go-short/internal/model"
-	"github.com/wiredmatt/go-short/internal/storage"
+	"github.com/wiredmatt/go_short/internal/model"
+	"github.com/wiredmatt/go_short/internal/storage"
 )
 
 type BenchmarkStore struct {
