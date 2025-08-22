@@ -10,18 +10,18 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:16-alpine
         ports:
-          - 5432:5432
+          - "5432:5432"
         env:
           POSTGRES_postgres: user
           POSTGRES_PASSWORD: password
           POSTGRES_DB: shortener
-        options: >-
-          --health-cmd="pg_isready -U testuser -d shortener"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
 
     steps:
       - name: Checkout repository
@@ -44,17 +44,6 @@ jobs:
 
       - name: Install dependencies
         run: go mod download
-
-      - name: Wait for Postgres to be ready
-        run: |
-          for i in {1..10}; do
-            if pg_isready -h localhost -p 5432 -U testuser -d shortener; then
-              echo "Postgres is ready!"
-              break
-            fi
-            echo "Waiting for Postgres..."
-            sleep 3
-          done
 
       - name: Run tests
         run: make test
