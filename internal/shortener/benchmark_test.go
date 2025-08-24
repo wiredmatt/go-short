@@ -182,3 +182,39 @@ func BenchmarkMemoryStore_ConcurrentAccess(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkListMappings(b *testing.B) {
+	mockStore := &BenchmarkStore{}
+	baseURL := "https://short.url"
+	shortCodeLength := 6
+	service := NewService(mockStore, baseURL, shortCodeLength)
+
+	userID := "user123"
+	expectedMappings := []model.URLMapping{
+		{
+			Code:      "abc123",
+			Original:  "https://example.com/url1",
+			UserID:    userID,
+			CreatedAt: time.Now(),
+			Clicks:    5,
+		},
+		{
+			Code:      "def456",
+			Original:  "https://example.com/url2",
+			UserID:    userID,
+			CreatedAt: time.Now(),
+			Clicks:    10,
+		},
+	}
+
+	mockStore.On("ListByUser", userID).Return(expectedMappings, nil)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err := service.ListMappings(userID)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}

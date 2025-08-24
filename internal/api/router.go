@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/danielgtaylor/huma/v2"
 	humago "github.com/danielgtaylor/huma/v2/adapters/humago"
@@ -37,6 +38,26 @@ type ResolveInput struct {
 type ResolveOutput struct {
 	Location string `header:"Location"`
 	Status   int    `json:"status" example:"302"`
+}
+
+type ListMappingsInput struct {
+	UserID string `query:"userId"`
+}
+
+type URLMappingOutput struct {
+	Code      string  `json:"code"`
+	Original  string  `json:"original_url"`
+	ShortURL  string  `json:"short_url"`
+	CreatedAt string  `json:"created_at"`
+	ExpiresAt *string `json:"expires_at,omitempty"`
+	Clicks    int     `json:"clicks"`
+}
+
+type ListMappingsOutput struct {
+	Body struct {
+		Mappings []URLMappingOutput `json:"mappings"`
+	}
+	Status int `json:"status" example:"200"`
 }
 
 func NewRouter(service shortener.Shortener) *http.ServeMux {
@@ -90,6 +111,42 @@ func NewRouter(service shortener.Shortener) *http.ServeMux {
 			Location: originalURL,
 			Status:   http.StatusFound,
 		}, nil
+	})
+
+	huma.Register(humaAPI, huma.Operation{
+		Method:  http.MethodGet,
+		Path:    "/mappings",
+		Summary: "List URL mappings for a user",
+	}, func(ctx context.Context, in *ListMappingsInput) (*ListMappingsOutput, error) {
+		if in.UserID == "" {
+			return nil, huma.NewError(http.StatusBadRequest, "userId is required")
+		}
+
+		mappings, err := service.ListMappings(in.UserID)
+		if err != nil {
+			return nil, huma.NewError(http.StatusInternalServerError, err.Error())
+		}
+
+		var output ListMappingsOutput
+		output.Body.Mappings = make([]URLMappingOutput, len(mappings))
+
+		for i, mapping := range mappings {
+			output.Body.Mappings[i] = URLMappingOutput{
+				Code:      mapping.Code,
+				Original:  mapping.Original,
+				ShortURL:  service.GetBaseURL() + "/" + mapping.Code,
+				CreatedAt: mapping.CreatedAt.Format(time.RFC3339),
+				Clicks:    mapping.Clicks,
+			}
+
+			if mapping.ExpiresAt != nil {
+				expiresAt := mapping.ExpiresAt.Format(time.RFC3339)
+				output.Body.Mappings[i].ExpiresAt = &expiresAt
+			}
+		}
+
+		output.Status = http.StatusOK
+		return &output, nil
 	})
 
 	metricsMux := http.NewServeMux()

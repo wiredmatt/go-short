@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/wiredmatt/go_short/internal/model"
 )
 
 type MockShortenerService struct {
@@ -28,6 +29,11 @@ func (m *MockShortenerService) Shorten(userID, originalURL string) (string, erro
 func (m *MockShortenerService) Resolve(code string) (string, error) {
 	args := m.Called(code)
 	return args.String(0), args.Error(1)
+}
+
+func (m *MockShortenerService) ListMappings(userID string) ([]model.URLMapping, error) {
+	args := m.Called(userID)
+	return args.Get(0).([]model.URLMapping), args.Error(1)
 }
 
 func TestRouter_HealthEndpoint(t *testing.T) {

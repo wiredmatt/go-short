@@ -20,6 +20,7 @@ func TestPostgresStoreIntegration(t *testing.T) {
 
 	ctx := context.Background()
 
+	ResetPostgresStore(cfg.Database.ConnectionString)
 	store, err := NewPostgresStore(ctx, cfg.Database.ConnectionString)
 	assert.NoError(t, err)
 

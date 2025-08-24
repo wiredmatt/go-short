@@ -19,3 +19,16 @@ func NewStore(ctx context.Context, cfg config.DatabaseConfig) (Store, error) {
 		return nil, fmt.Errorf("unknown database type: %s", cfg.Type)
 	}
 }
+
+func ResetStore(ctx context.Context, cfg config.DatabaseConfig) error {
+	switch cfg.Type {
+	case "memory":
+		return nil
+	case "redis":
+		return fmt.Errorf("redis storage not yet implemented")
+	case "postgres":
+		return ResetPostgresStore(cfg.ConnectionString)
+	default:
+		return fmt.Errorf("unknown database type: %s", cfg.Type)
+	}
+}

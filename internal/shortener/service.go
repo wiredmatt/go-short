@@ -16,6 +16,7 @@ type Shortener interface {
 	GetBaseURL() string
 	Shorten(userID, originalURL string) (string, error)
 	Resolve(code string) (string, error)
+	ListMappings(userID string) ([]model.URLMapping, error)
 }
 
 type ShortenerService struct {
@@ -68,12 +69,37 @@ func (s *ShortenerService) Resolve(code string) (string, error) {
 			slog.Group("input", slog.String("code", code)),
 			slog.String("error", err.Error()),
 		)
+		return "", err
 	}
 
 	if original_url == nil {
 		return "", errors.New("code not found")
 	}
+
+	// Increment click count asynchronously to avoid blocking the redirect
+	go func() {
+		if err := s.store.IncrementClickCount(code); err != nil {
+			s.logger.Warn("Failed to increment click count",
+				slog.String("code", code),
+				slog.String("error", err.Error()),
+			)
+		}
+	}()
+
 	return *original_url, nil
+}
+
+func (s *ShortenerService) ListMappings(userID string) ([]model.URLMapping, error) {
+	mappings, err := s.store.ListByUser(userID)
+	if err != nil {
+		s.logger.Error("ListMappings failed",
+			slog.String("userID", userID),
+			slog.String("error", err.Error()),
+		)
+		return nil, err
+	}
+
+	return mappings, nil
 }
 
 func generateCode(length int) string {

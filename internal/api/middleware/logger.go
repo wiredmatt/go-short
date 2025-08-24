@@ -33,7 +33,7 @@ func RequestLogger(ctx huma.Context, next func(huma.Context)) {
 			slog.Int64("duration_ms", duration.Milliseconds()),
 		)
 	} else {
-		requestLogger.Error("request completed",
+		requestLogger.Debug("request completed",
 			slog.String("request_id", GetRequestID(ctx)),
 			slog.String("method", method),
 			slog.String("path", path),

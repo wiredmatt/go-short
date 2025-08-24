@@ -25,6 +25,7 @@ func TestShortenerIntegration(t *testing.T) {
 
 	ctx := context.Background()
 
+	storage.ResetStore(ctx, cfg.Database)
 	store, err := storage.NewStore(ctx, cfg.Database)
 	assert.NoError(t, err)
 
@@ -139,6 +140,63 @@ func TestShortenerIntegration(t *testing.T) {
 			assert.Equal(t, http.StatusFound, w.Code)
 			assert.Equal(t, urls[i], w.Header().Get("Location"))
 		}
+	})
+
+	t.Run("List Mappings API", func(t *testing.T) {
+		reqBody := map[string]string{
+			"userId": "user456",
+			"url":    "https://example.com/mapping-test",
+		}
+
+		jsonBody, _ := json.Marshal(reqBody)
+		req := httptest.NewRequest("POST", "/shorten", bytes.NewBuffer(jsonBody))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		mappingsReq := httptest.NewRequest("GET", "/mappings?userId=user456", nil)
+		mappingsW := httptest.NewRecorder()
+
+		router.ServeHTTP(mappingsW, mappingsReq)
+
+		assert.Equal(t, http.StatusOK, mappingsW.Code)
+
+		var mappingsRes struct {
+			Mappings []struct {
+				Code      string `json:"code"`
+				Original  string `json:"original_url"`
+				ShortURL  string `json:"short_url"`
+				CreatedAt string `json:"created_at"`
+				Clicks    int    `json:"clicks"`
+			} `json:"mappings"`
+		}
+
+		err := json.Unmarshal(mappingsW.Body.Bytes(), &mappingsRes)
+		assert.NoError(t, err)
+		assert.GreaterOrEqual(t, len(mappingsRes.Mappings), 1)
+
+		var foundMapping *struct {
+			Code      string `json:"code"`
+			Original  string `json:"original_url"`
+			ShortURL  string `json:"short_url"`
+			CreatedAt string `json:"created_at"`
+			Clicks    int    `json:"clicks"`
+		}
+
+		for i := range mappingsRes.Mappings {
+			if mappingsRes.Mappings[i].Original == "https://example.com/mapping-test" {
+				foundMapping = &mappingsRes.Mappings[i]
+				break
+			}
+		}
+
+		assert.NotNil(t, foundMapping)
+		assert.Equal(t, "https://example.com/mapping-test", foundMapping.Original)
+		assert.Equal(t, 0, foundMapping.Clicks, "New mapping should have 0 clicks")
+		assert.Contains(t, foundMapping.ShortURL, cfg.App.BaseURL)
 	})
 
 	t.Run("Invalid Shorten Request", func(t *testing.T) {
