@@ -5,3 +5,5 @@ resources:
   - namespace.yaml
   - postgres.yaml
   - api.yaml
+  - monitoring.yaml
+  - ingress.yaml
